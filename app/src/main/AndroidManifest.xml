@@ -22,6 +22,22 @@
         <activity
             android:name=".Authentication"
             android:label="@string/title_activity_authentication"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Registration"
+            android:label="@string/title_activity_registration"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".NavigationDrawerActivity"
+            android:label="@string/title_activity_navigation_drawer"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".UserProfile"
+            android:label="@string/title_activity_user_profile"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".GoogleInActivity"
+            android:label="@string/title_activity_google_in"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

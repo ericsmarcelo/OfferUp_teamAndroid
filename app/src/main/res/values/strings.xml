@@ -11,4 +11,23 @@
     <string name="reset_password">Reset Password</string>
     <string name="create_account">Create Account</string>
     <string name="offerup">OfferUp</string>
+    <string name="title_activity_registration">Registration</string>
+    <string name="name">(Name)</string>
+    <string name="register">Register</string>
+    <string name="registration_password">Password...</string>
+    <string name="registration_email">Email...</string>
+    <string name="title_activity_navigation_drawer">OfferUp</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_user_profile">Profile</string>
+    <string name="android_studio">Android Studio</string>
+    <string name="google_sign_out">Google Sign Out</string>
+    <string name="google_sign_in">Google Sign-in</string>
+    <string name="google_in">Google In</string>
+    <string name="registration">Registration</string>
+    <string name="google_logout">Google Logout</string>
+    <string name="google_login">Google Login</string>
+    <string name="todo">TODO</string>
+    <string name="title_activity_google_in">Google Login </string>
 </resources>

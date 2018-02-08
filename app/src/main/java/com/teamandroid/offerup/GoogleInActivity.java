@@ -193,6 +193,15 @@ public class GoogleInActivity extends AppCompatActivity implements GoogleApiClie
                         }
                     }
                 });
+        fbAuth.getCurrentUser().linkWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(!task.isSuccessful()) {
+                            notifyUser("Google link failed");
+                        }
+                    }
+                });
     }
     //Sign Out
     public void googleSignOut(View view) {
