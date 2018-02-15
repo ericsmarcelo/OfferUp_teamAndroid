@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +16,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Registration extends AppCompatActivity {
 
@@ -23,8 +25,10 @@ public class Registration extends AppCompatActivity {
     private TextView userText;
     private TextView nameText;
     private TextView statusText;
+    private Button registerButton;
     private FirebaseAuth fbAuth;
     private FirebaseAuth.AuthStateListener authListener;
+    private FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +37,7 @@ public class Registration extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        registerButton = findViewById(R.id.registration);
         nameText = findViewById((R.id.registrationNameText));
         userText = findViewById(R.id.userText);
         statusText = findViewById(R.id.statusText);
@@ -42,6 +46,7 @@ public class Registration extends AppCompatActivity {
         userText.setText("");
         statusText.setText("");
 
+        database = FirebaseDatabase.getInstance();
         fbAuth = FirebaseAuth.getInstance();
         FirebaseUser user = fbAuth.getCurrentUser();
 
@@ -56,6 +61,15 @@ public class Registration extends AppCompatActivity {
                 }
             }
         };
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // createAccount function defined below
+                createAccount(view);
+            }
+        });
+
 
 
 
@@ -89,9 +103,14 @@ public class Registration extends AppCompatActivity {
 
     //Create an account
     public void createAccount(View view) {
-        String email = emailText.getText().toString();
-        String password = passwordText.getText().toString();
-        FirebaseUser user;
+        final String name = nameText.getText().toString();
+        final String email = emailText.getText().toString();
+        final String password = passwordText.getText().toString();
+
+        if (name.length() == 0) {
+            nameText.setError("Enter a name");
+            return;
+        }
 
         if (email.length() == 0) {
             emailText.setError("Enter an email address");
@@ -110,13 +129,29 @@ public class Registration extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             notifyUser("Account creation failed");
                         }
+                        else {
+                            // account successfully created
+
+                            // create User with given info (excluding password)
+                            User dbUser = new User(name, email);
+
+                            // get firebase uid of current logged in user
+                            String uid = task.getResult().getUser().getUid();
+
+                            // add user to RealtimeDatabase
+                            database.getReference("users").child(uid).setValue(dbUser);
+
+                            // go to profile activity (should change to home page later)
+                            Intent intent = new Intent(Registration.this, UserProfile.class);
+                            startActivity(intent);
+                        }
                     }
                 });
 
-        if((user = fbAuth.getCurrentUser()) != null) {
-            Intent intent = new Intent(this, NavigationDrawerActivity.class);
-            startActivity(intent);
-        }
+//        if(fbAuth.getCurrentUser() != null) {
+//            Intent intent = new Intent(this, NavigationDrawerActivity.class);
+//            startActivity(intent);
+//        }
 
     }
 
