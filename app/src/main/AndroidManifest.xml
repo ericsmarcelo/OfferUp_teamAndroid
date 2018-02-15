@@ -39,6 +39,22 @@
             android:name=".GoogleInActivity"
             android:label="@string/title_activity_google_in"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".ItemFormPage1"
+            android:label="Item Form"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ItemFormPage2"
+            android:label="Item Form"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ItemFormPage3"
+            android:label="Item Form"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ItemFormPage4"
+            android:label="Item Form"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
