@@ -7,6 +7,7 @@ public class User {
 
     private String name;
     private String email;
+    private String phoneNumber;
     private String city;
     private String state;
     private double rating;
@@ -19,6 +20,7 @@ public class User {
     public User(String name, String email) {
         this.name = name;
         this.email = email;
+        this.phoneNumber = "";
         this.city = "";
         this.state = "";
         this.rating = 0.0;
@@ -33,6 +35,10 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public String getCity() {
@@ -62,6 +68,10 @@ public class User {
 
     public void setEmail(String newEmail) {
         email = newEmail;
+    }
+
+    public void setPhoneNumber(String newPhone) {
+        phoneNumber = newPhone;
     }
 
     public void setCity(String newCity) {
