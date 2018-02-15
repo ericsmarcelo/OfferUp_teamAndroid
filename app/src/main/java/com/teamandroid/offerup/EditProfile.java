@@ -64,8 +64,8 @@ public class EditProfile extends AppCompatActivity {
                 fbDatabase.getReference("users").child(fbUser.getUid()).setValue(currentUser);
 
                 // Go to User Profile when changes are saved.
-                Intent intent = new Intent(EditProfile.this, UserProfile.class);
-                startActivity(intent);
+                notifyUser("Changes Saved.");
+                finish();
             }
         });
 

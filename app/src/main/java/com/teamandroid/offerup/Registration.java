@@ -148,11 +148,6 @@ public class Registration extends AppCompatActivity {
                     }
                 });
 
-//        if(fbAuth.getCurrentUser() != null) {
-//            Intent intent = new Intent(this, NavigationDrawerActivity.class);
-//            startActivity(intent);
-//        }
-
     }
 
 }
