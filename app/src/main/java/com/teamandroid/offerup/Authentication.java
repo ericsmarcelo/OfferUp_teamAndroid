@@ -48,9 +48,9 @@ public class Authentication extends AppCompatActivity {
                     statusText.setText("Signed In");
 
                     // if already signed in, send them directly to their profile.
-                    notifyUser("Already Signed In");
-                    Intent intent = new Intent(Authentication.this, UserProfile.class);
-                    startActivity(intent);
+                    //notifyUser("Already Signed In");
+                    //Intent intent = new Intent(Authentication.this, UserProfile.class);
+                    //startActivity(intent);
 
                 }
             }
@@ -125,6 +125,11 @@ public class Authentication extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
                             notifyUser("Authentication failed");
+                        }
+                        else {
+                            // successful login, go to profile activity (should change later)
+                            Intent intent = new Intent(Authentication.this, UserProfile.class);
+                            startActivity(intent);
                         }
                     }
                 });

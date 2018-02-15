@@ -3,6 +3,9 @@ package com.teamandroid.offerup;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,10 +22,22 @@ public class EditProfile extends AppCompatActivity {
     private FirebaseUser fbUser;
     private User currentUser;
 
+    private EditText editName;
+    private EditText editPhone;
+    private EditText editCity;
+    private EditText editState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+
+        editName = findViewById(R.id.editProfileEditName);
+        editPhone = findViewById(R.id.editProfileEditPhone);
+        editCity = findViewById(R.id.editProfileEditCity);
+        editState = findViewById(R.id.editProfileEditState);
+        Button saveChangesButton = findViewById(R.id.saveChangesButton);
+        Button restoreButton = findViewById(R.id.restoreValuesButton);
 
         fbDatabase = FirebaseDatabase.getInstance();
         fbAuth = FirebaseAuth.getInstance();
@@ -36,8 +51,33 @@ public class EditProfile extends AppCompatActivity {
         }
         else {
             fbDatabase.getReference("users").child(fbUser.getUid()).addListenerForSingleValueEvent(userListener);
-
         }
+
+        saveChangesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentUser.setName(editName.getText().toString());
+                currentUser.setPhoneNumber(editPhone.getText().toString());
+                currentUser.setCity(editCity.getText().toString());
+                currentUser.setState(editState.getText().toString());
+
+                fbDatabase.getReference("users").child(fbUser.getUid()).setValue(currentUser);
+
+                // Go to User Profile when changes are saved.
+                Intent intent = new Intent(EditProfile.this, UserProfile.class);
+                startActivity(intent);
+            }
+        });
+
+        restoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editName.setText(currentUser.getName());
+                editPhone.setText(currentUser.getPhoneNumber());
+                editCity.setText(currentUser.getCity());
+                editState.setText(currentUser.getState());
+            }
+        });
     }
 
     ValueEventListener userListener = new ValueEventListener() {
@@ -45,29 +85,11 @@ public class EditProfile extends AppCompatActivity {
         public void onDataChange(DataSnapshot dataSnapshot) {
             currentUser = dataSnapshot.getValue(User.class);
             if (currentUser != null) {
-
-                // get all parameters from the User (to avoid multiple function calls per each parameter)
-                userName.setText(dbUser.getName());
-                userEmail.setText(dbUser.getEmail());
-                String userPhoneNumber = dbUser.getPhoneNumber();
-//                String userCity = dbUser.getCity();
-//                String userState = dbUser.getState();
-//                double userRating = dbUser.getRating();
-
-                // set all text views to the value from user, granted that the value is not empty
-                if (userPhoneNumber != "") {
-                    userPhone.setText(userPhoneNumber);
-                }
-                else {
-                    userPhone.setText("(000) 000-0000");
-                }
-//                if (userCity != "" || userCity != null) {
-//                    profileCity.setText(userCity);
-//                }
-//                if(userState != "" || userState != null) {
-//                    profileState.setText(userState);
-//                }
-//                profileRating.setText(String.valueOf(userRating));
+                // set input values to current User data, so they only change what they want
+                editName.setText(currentUser.getName());
+                editPhone.setText(currentUser.getPhoneNumber());
+                editCity.setText(currentUser.getCity());
+                editState.setText(currentUser.getState());
             }
         }
 
@@ -78,6 +100,6 @@ public class EditProfile extends AppCompatActivity {
     };
 
     private void notifyUser(String message) {
-        Toast.makeText(Registration.this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(EditProfile.this, message, Toast.LENGTH_SHORT).show();
     }
 }

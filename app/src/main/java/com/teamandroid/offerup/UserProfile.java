@@ -81,6 +81,16 @@ public class UserProfile extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        FirebaseUser user = fbAuth.getCurrentUser();
+        if (user != null) {
+            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+        }
+
+    }
+
     ValueEventListener userListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
