@@ -21,7 +21,7 @@ public class Registration extends AppCompatActivity {
     private EditText emailText;
     private EditText passwordText;
     private TextView userText;
-    //private TextView nameText;
+    private TextView nameText;
     private TextView statusText;
     private FirebaseAuth fbAuth;
     private FirebaseAuth.AuthStateListener authListener;
@@ -34,11 +34,11 @@ public class Registration extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        //nameText = (TextView)findViewById((R.id.registrationNameText));
-        userText = (TextView) findViewById(R.id.userText);
-        statusText = (TextView) findViewById(R.id.statusText);
-        emailText = (EditText) findViewById(R.id.emailText);
-        passwordText = (EditText) findViewById(R.id.passwordText);
+        nameText = findViewById((R.id.registrationNameText));
+        userText = findViewById(R.id.userText);
+        statusText = findViewById(R.id.statusText);
+        emailText = findViewById(R.id.emailText);
+        passwordText = findViewById(R.id.passwordText);
         userText.setText("");
         statusText.setText("");
 
