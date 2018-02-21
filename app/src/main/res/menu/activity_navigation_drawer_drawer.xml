@@ -8,7 +8,7 @@
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:title="Camera" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
@@ -36,21 +36,21 @@
         </menu>
     </item>
 
-    <item android:title="User" />
-    <group>
-        <item
-            android:id="@+id/navigation_profile"
-            android:icon="@drawable/ic_perm_identity_black_24dp"
-            android:title="Profile" />
-        <item
-            android:id="@+id/navigation_logout"
-            android:icon="@drawable/ic_close_black_24dp"
-            android:title="Logout" />
-        <item
-            android:id="@+id/navigation_google"
-            android:icon="@drawable/ic_verified_user_black_24dp"
-            android:title="Google Login/ Logout" />
-
-    </group>
+    <item android:title="User">
+        <menu>
+            <item
+                android:id="@+id/navigation_profile"
+                android:icon="@drawable/ic_perm_identity_black_24dp"
+                android:title="Profile" />
+            <item
+                android:id="@+id/navigation_logout"
+                android:icon="@drawable/ic_close_black_24dp"
+                android:title="Logout" />
+            <item
+                android:id="@+id/navigation_google"
+                android:icon="@drawable/ic_verified_user_black_24dp"
+                android:title="Google Login/ Logout" />
+        </menu>
+    </item>
 
 </menu>
