@@ -31,13 +31,4 @@
     <string name="google_login">Google Login</string>
     <string name="todo">TODO</string>
     <string name="title_activity_google_in">Google Login </string>
-
-    <string name="image_name">Image Here</string>
-    <string name="item_name">Enter Item Name Here</string>
-    <string name="take_photo">Take Photo</string>
-    <string name="upload">Upload</string>
-    <string name="label_1">1</string>
-    <string name="label_2">2</string>
-    <string name="label_3">3</string>
-    <string name="label_4">4</string>
 </resources>
