@@ -39,20 +39,7 @@
             android:name=".GoogleInActivity"
             android:label="@string/title_activity_google_in"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MessagingActivity"></activity>
-
-        <service android:name=".FirebaseIDService">
-            <intent-filter>
-                <action
-                    android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
-        </service>
-
-        <service android:name=".FirebaseMsgService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
+        <activity android:name=".EditProfile"></activity>
     </application>
 
 </manifest>

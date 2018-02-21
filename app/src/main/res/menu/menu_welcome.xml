@@ -20,4 +20,8 @@
         android:id="@+id/action_googleIn"
         android:orderInCategory="105"
         android:title="@string/google_in" />
+    <item
+        android:id="@+id/action_profile"
+        android:orderInCategory="106"
+        android:title="View Profile" />
 </menu>

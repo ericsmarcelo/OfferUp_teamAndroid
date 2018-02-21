@@ -14,7 +14,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-
+// Login Page
 public class Authentication extends AppCompatActivity {
 
     private TextView userText;
@@ -29,10 +29,10 @@ public class Authentication extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentication);
 
-        userText = (TextView) findViewById(R.id.userText);
-        statusText = (TextView) findViewById(R.id.statusText);
-        emailText = (EditText) findViewById(R.id.emailText);
-        passwordText = (EditText) findViewById(R.id.passwordText);
+        userText = findViewById(R.id.userText);
+        statusText = findViewById(R.id.statusText);
+        emailText = findViewById(R.id.emailText);
+        passwordText = findViewById(R.id.passwordText);
         userText.setText("");
         statusText.setText("Signed Out");
 
@@ -46,6 +46,12 @@ public class Authentication extends AppCompatActivity {
                 if(user != null) {
                     userText.setText(user.getEmail());
                     statusText.setText("Signed In");
+
+                    // if already signed in, send them directly to their profile.
+                    //notifyUser("Already Signed In");
+                    //Intent intent = new Intent(Authentication.this, UserProfile.class);
+                    //startActivity(intent);
+
                 }
             }
         };
@@ -103,11 +109,6 @@ public class Authentication extends AppCompatActivity {
         String password = passwordText.getText().toString();
         boolean user = false;
 
-        if(fbAuth.getCurrentUser() != null) {
-            Intent intent = new Intent(this, NavigationDrawerActivity.class);
-            startActivity(intent);
-        }
-
         if (email.length() == 0) {
             emailText.setError("Enter an email address");
             return;
@@ -124,6 +125,11 @@ public class Authentication extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
                             notifyUser("Authentication failed");
+                        }
+                        else {
+                            // successful login, go to profile activity (should change later)
+                            Intent intent = new Intent(Authentication.this, UserProfile.class);
+                            startActivity(intent);
                         }
                     }
                 });
