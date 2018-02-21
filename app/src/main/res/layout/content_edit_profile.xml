@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_edit_profile">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editProfileText"
+        android:text="Edit Profile"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editProfileText"
+        android:layout_marginTop="32dp"
+        android:padding="16dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editProfileLayoutName"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="72dip"
+                android:layout_height="match_parent"
+                android:text="Name:"
+                android:background="@color/lightGrey"
+                android:paddingRight="8dp"
+                android:paddingLeft="8dp"
+                android:gravity="center" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editProfileEditName"
+                android:inputType="textPersonName"
+                android:hint="Name"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editProfileLayoutPhone"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="72dip"
+                android:layout_height="match_parent"
+                android:text="Phone:"
+                android:background="@color/lightGrey"
+                android:paddingRight="8dp"
+                android:paddingLeft="8dp"
+                android:gravity="center" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editProfileEditPhone"
+                android:inputType="text"
+                android:hint="Phone Number"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editProfileLayoutCity"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="72dip"
+                android:layout_height="match_parent"
+                android:text="City:"
+                android:background="@color/lightGrey"
+                android:paddingRight="8dp"
+                android:paddingLeft="8dp"
+                android:gravity="center" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editProfileEditCity"
+                android:inputType="text"
+                android:hint="City"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editProfileLayoutState"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="72dip"
+                android:layout_height="match_parent"
+                android:text="State:"
+                android:background="@color/lightGrey"
+                android:paddingRight="8dp"
+                android:paddingLeft="8dp"
+                android:gravity="center" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editProfileEditState"
+                android:inputType="text"
+                android:hint="State"/>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/saveChangesButton"
+            android:text=" Save Changes"
+            android:drawableLeft="@drawable/ic_save"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/restoreValuesButton"
+            android:text=" Reload Values"
+            android:drawableLeft="@drawable/ic_refresh"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp" />
+
+
+    </LinearLayout>
+
+</RelativeLayout>
