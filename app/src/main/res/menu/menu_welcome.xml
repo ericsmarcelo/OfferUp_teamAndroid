@@ -12,6 +12,9 @@
         android:orderInCategory="102"
         android:title="@string/registration" />
     <item
+        android:orderInCategory="103"
+        android:title="Post Form" />
+    <item
         android:id="@+id/action_authentication"
         android:icon="@drawable/ic_menu_black_24dp"
         android:orderInCategory="104"
