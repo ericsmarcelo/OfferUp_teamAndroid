@@ -95,6 +95,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
+            Intent intent = new Intent(this, MessagingActivity.class);
+            startActivity(intent);
+            return true;
 
         } else if (id == R.id.navigation_profile) {
             Intent intent = new Intent(this, UserProfile.class);

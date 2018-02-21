@@ -103,6 +103,11 @@ public class Authentication extends AppCompatActivity {
         String password = passwordText.getText().toString();
         boolean user = false;
 
+        if(fbAuth.getCurrentUser() != null) {
+            Intent intent = new Intent(this, NavigationDrawerActivity.class);
+            startActivity(intent);
+        }
+
         if (email.length() == 0) {
             emailText.setError("Enter an email address");
             return;
