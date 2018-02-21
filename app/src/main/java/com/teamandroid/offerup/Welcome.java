@@ -70,6 +70,10 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
             startActivity(intent);
             return true;
         }
+        else if (id == R.id.action_profile) {
+            Intent intent = new Intent(this, UserProfile.class);
+            startActivity(intent);
+        }
 
         return super.onOptionsItemSelected(item);
     }

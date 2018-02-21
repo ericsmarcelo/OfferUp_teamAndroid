@@ -42,6 +42,7 @@
             android:name=".GoogleInActivity"
             android:label="@string/title_activity_google_in"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".EditProfile"></activity>
         <activity android:name=".MessagingActivity" />
         <activity android:name=".CameraActivity"
             android:label="Camera"/>
