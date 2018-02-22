@@ -33,4 +33,9 @@ public class ItemFormPage4 extends AppCompatActivity {
         Intent intent = new Intent(this, ItemFormPage3.class);
         startActivity(intent);
     }
+
+    public void toHome (View view) {
+        Intent intent = new Intent(this, Welcome.class);
+        startActivity(intent);
+    }
 }
