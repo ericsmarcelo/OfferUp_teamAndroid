@@ -12,7 +12,7 @@
         android:orderInCategory="102"
         android:title="@string/registration" />
     <item
-        android:id="@+id/action_post"
+        android:id="@+id/action_postform"
         android:orderInCategory="103"
         android:title="Post Form" />
     <item

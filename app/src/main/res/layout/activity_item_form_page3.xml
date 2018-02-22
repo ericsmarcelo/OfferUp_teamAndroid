@@ -105,7 +105,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="2dp"
         android:gravity="center"
         android:text="Price ($)"
         android:textSize="20sp"
@@ -124,10 +124,13 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="15dp"
         android:gravity="center"
         android:ems="10"
         android:inputType="numberDecimal"
+        android:text="Price"
+        android:textSize="20sp"
+        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -147,7 +150,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-     -->
 
     <Spinner
         android:id="@+id/spinner1"
@@ -163,6 +165,27 @@
         app:layout_constraintTop_toTopOf="parent"
         android:prompt="@string/spin"
         android:entries="@array/spinnerItems1"/>
+    -->
+
+    <EditText
+        android:id="@+id/itemCond"
+        android:layout_width="306dp"
+        android:layout_height="39dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="1dp"
+        android:gravity="center"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:text="Condition"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.50" />
 
     <TextView
         android:id="@+id/textView3"
@@ -175,11 +198,13 @@
         android:gravity="center"
         android:text="Condition"
         android:textSize="20sp"
+        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.50"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.39" />
+        app:layout_constraintVertical_bias="0.400" />
 
     <Spinner
         android:id="@+id/spinner"
@@ -209,6 +234,7 @@
         android:gravity="center"
         android:text="Select Category"
         android:textSize="20sp"
+        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
