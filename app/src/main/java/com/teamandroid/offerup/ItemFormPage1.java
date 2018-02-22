@@ -46,7 +46,6 @@ public class ItemFormPage1 extends AppCompatActivity {
         itemName = findViewById(R.id.itemName);
         imageView = findViewById(R.id.imageView);
 
-
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,36 +56,32 @@ public class ItemFormPage1 extends AppCompatActivity {
             }
         });
 
+        bundle = new Bundle();
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            bundle = data.getExtras();
-            Bitmap imageBitmap = (Bitmap)bundle.get("data");
+            Bitmap imageBitmap = (Bitmap)data.getExtras().get("data");
             imageView.setImageBitmap(imageBitmap);
+
+            bundle.putBundle("IMAGE", data.getExtras());
         }
-
-//        if(getIntent().getExtras() == null){
-//            bundle = new Bundle();
-//        }
-//        else{
-//            bundle = getIntent().getExtras();
-//        }
-
     }
 
-//    @Override
-//    public void onResume(){
-//        super.onResume();
-//        if(bundle.getString("ITEM_NAME") != null) {
-//            itemName.setText(bundle.getString("ITEM_NAME"));
-//        }
-//    }
-
     public void toPageTwo(View view) {
+        if(itemName.getText().toString() == "") {
+            Toast.makeText(this, "Please add item name.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         bundle.putString("ITEM_NAME", itemName.getText().toString());
+
+        if(bundle.getBundle("IMAGE") == null) {
+            Toast.makeText(this, "Please add image.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent intent = new Intent(this, ItemFormPage2.class);
         intent.putExtras(bundle);
         startActivity(intent);
