@@ -20,6 +20,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ public class UserProfile extends AppCompatActivity {
         userPhone = (TextView) findViewById(R.id.userPhoneText);
 
         LinearLayout rating = (LinearLayout) findViewById(R.id.rating);
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
         rating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,11 +64,6 @@ public class UserProfile extends AppCompatActivity {
 
         fbAuth = FirebaseAuth.getInstance();
         FirebaseUser user = fbAuth.getCurrentUser();
-
-        userName.setText("Name");
-        userEmail.setText("email");
-        userPhone.setText("(000) 000-0000");
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,9 +120,10 @@ public class UserProfile extends AppCompatActivity {
         }
         else {
             // user not logged in
-            userName.setText("Name");
-            userEmail.setText("email");
-            userPhone.setText("(000) 000-0000");
+            userName.setText("Shweti Mahajan");
+            userEmail.setText("shwetimahajan1993@gmail.com");
+            userPhone.setText("(984) 528-1129");
+            ratingBar.setRating(3.5f);
         }
 
     }
@@ -152,7 +150,7 @@ public class UserProfile extends AppCompatActivity {
                 String userPhoneNumber = dbUser.getPhoneNumber();
 //                String userCity = dbUser.getCity();
 //                String userState = dbUser.getState();
-//                double userRating = dbUser.getRating();
+                double userRating = dbUser.getRating();
 
                 // set all text views to the value from user, granted that the value is not empty
                 if (userPhoneNumber != "") {
