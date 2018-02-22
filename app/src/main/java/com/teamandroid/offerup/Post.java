@@ -1,5 +1,7 @@
 package com.teamandroid.offerup;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Post {
@@ -65,6 +67,7 @@ public class Post {
     public void setCategory(List<String> newCategory) {
         category = newCategory;
     }
+
 
     public void setCondition(String newCondition) {
         condition = newCondition;

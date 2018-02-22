@@ -40,6 +40,7 @@
     <string name="label_2">2</string>
     <string name="label_3">3</string>
     <string name="label_4">4</string>
+  
     <string name="next">Next</string>
     <string name="description">Enter a description for your item</string>
     <string name="spin">Choose a category</string>
