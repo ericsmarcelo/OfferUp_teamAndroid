@@ -77,13 +77,13 @@ public class ItemFormPage1 extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-        if(bundle.getString("ITEM_NAME") != null) {
-            itemName.setText(bundle.getString("ITEM_NAME"));
-        }
-    }
+//    @Override
+//    public void onResume(){
+//        super.onResume();
+//        if(bundle.getString("ITEM_NAME") != null) {
+//            itemName.setText(bundle.getString("ITEM_NAME"));
+//        }
+//    }
 
     public void toPageTwo(View view) {
         bundle.putString("ITEM_NAME", itemName.getText().toString());
