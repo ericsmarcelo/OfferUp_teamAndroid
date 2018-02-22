@@ -19,6 +19,7 @@ public class ItemFormPage3 extends AppCompatActivity {
     private Bundle b;
     private EditText itemPrice;
     private EditText itemCond;
+    private Spinner spinner;
 
     private FirebaseAuth fbAuth;
 
@@ -37,6 +38,7 @@ public class ItemFormPage3 extends AppCompatActivity {
         }
         itemPrice = findViewById(R.id.itemPrice);
         itemCond = findViewById(R.id.itemCond);
+        spinner = findViewById(R.id.spinner);
 
         //fbAuth = FirebaseAuth.getInstance();
         //FirebaseUser user = fbAuth.getCurrentUser();
@@ -93,6 +95,8 @@ public class ItemFormPage3 extends AppCompatActivity {
             b.putFloat("ITEM_PRICE", Float.valueOf(price));
         }
         b.putString("ITEM_COND", itemCond.getText().toString());
+        String tempCat = spinner.getSelectedItem().toString();
+        b.putString("CATEGORY", tempCat);
         Intent intent = new Intent(this, ItemFormPage4.class);
         intent.putExtras(b);
         startActivity(intent);
