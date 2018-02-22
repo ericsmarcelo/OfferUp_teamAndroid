@@ -13,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -29,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
@@ -40,7 +42,8 @@ public class UserProfile extends AppCompatActivity {
     private TextView userPhone;
     private FirebaseAuth fbAuth;
     private FirebaseDatabase database;
-    private User dbUser;
+    static private User dbUser;
+    static RatingBar ratingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +57,8 @@ public class UserProfile extends AppCompatActivity {
         userPhone = (TextView) findViewById(R.id.userPhoneText);
 
         LinearLayout rating = (LinearLayout) findViewById(R.id.rating);
-        RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
+        //RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
+        ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
         rating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,6 +66,7 @@ public class UserProfile extends AppCompatActivity {
             }
         });
 
+        database = FirebaseDatabase.getInstance();
         fbAuth = FirebaseAuth.getInstance();
         FirebaseUser user = fbAuth.getCurrentUser();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -128,6 +133,25 @@ public class UserProfile extends AppCompatActivity {
 
     }
 
+    static public void addRatingToUser(float newRating) {
+        // calculate new rating within User class
+        dbUser.addRating((double)newRating);
+
+        // log info
+        Log.e("UserProfile: ", "Added a new rating of: " + String.valueOf(newRating));
+        Log.e("UserProfile: ", "New total rating: " + String.valueOf(dbUser.getRating()));
+
+        // add new rating and ratingCount to firebase
+        FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(fbUser.getUid());
+        userRef.child("rating").setValue(dbUser.getRating());
+        userRef.child("ratingCount").setValue(dbUser.getRatingCount());
+
+        // set the stars of the ratingBar view
+        ratingBar.setRating((float)dbUser.getRating());
+
+    }
+
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -150,7 +174,7 @@ public class UserProfile extends AppCompatActivity {
                 String userPhoneNumber = dbUser.getPhoneNumber();
 //                String userCity = dbUser.getCity();
 //                String userState = dbUser.getState();
-                double userRating = dbUser.getRating();
+                ratingBar.setRating((float)dbUser.getRating());
 
                 // set all text views to the value from user, granted that the value is not empty
                 if (userPhoneNumber != "") {
