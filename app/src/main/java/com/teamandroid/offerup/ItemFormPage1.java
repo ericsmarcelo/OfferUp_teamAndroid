@@ -18,11 +18,13 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class ItemFormPage1 extends AppCompatActivity {
 
+    private Bundle bundle;
+    private EditText itemName;
+    private String image;
 
     private FirebaseAuth fbAuth;
 
     public ImageView imageView;
-    public EditText itemName;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_GALLERY = 2;
@@ -61,25 +63,45 @@ public class ItemFormPage1 extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap)extras.get("data");
+            bundle = data.getExtras();
+            Bitmap imageBitmap = (Bitmap)bundle.get("data");
             imageView.setImageBitmap(imageBitmap);
+        }
+
+//        if(getIntent().getExtras() == null){
+//            bundle = new Bundle();
+//        }
+//        else{
+//            bundle = getIntent().getExtras();
+//        }
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if(bundle.getString("ITEM_NAME") != null) {
+            itemName.setText(bundle.getString("ITEM_NAME"));
         }
     }
 
     public void toPageTwo(View view) {
-        String data = itemName.getText().toString();
+        bundle.putString("ITEM_NAME", itemName.getText().toString());
         Intent intent = new Intent(this, ItemFormPage2.class);
-        intent.putExtra("ITEM_NAME", data);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
     public void toPageThree(View view) {
+        bundle.putString("ITEM_NAME", itemName.getText().toString());
         Intent intent = new Intent(this, ItemFormPage3.class);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 
     public void toPageFour(View view) {
+        bundle.putString("ITEM_NAME", itemName.getText().toString());
         Intent intent = new Intent(this, ItemFormPage4.class);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 }
