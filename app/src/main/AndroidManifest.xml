@@ -48,6 +48,22 @@
         <activity android:name=".MessagingActivity" />
         <activity android:name=".CameraActivity"
             android:label="Camera"/>
+        <activity
+            android:name=".ItemFormPage1"
+            android:label="Item Form"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ItemFormPage2"
+            android:label="Item Form"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ItemFormPage3"
+            android:label="Item Form"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ItemFormPage4"
+            android:label="Item Form"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name=".FirebaseIDService">
             <intent-filter>
