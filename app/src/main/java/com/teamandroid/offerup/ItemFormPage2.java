@@ -51,6 +51,7 @@ public class ItemFormPage2 extends AppCompatActivity {
         intent.putExtras(b);
         startActivity(intent);
     }
+
     public void toPageThree(View view) {
         b.putString("ITEM_DESC", itemDesc.getText().toString());
         Intent intent = new Intent(this, ItemFormPage3.class);

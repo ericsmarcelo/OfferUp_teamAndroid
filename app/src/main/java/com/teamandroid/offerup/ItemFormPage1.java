@@ -86,6 +86,7 @@ public class ItemFormPage1 extends AppCompatActivity {
         intent.putExtras(bundle);
         startActivity(intent);
     }
+
     public void toPageThree(View view) {
         bundle.putString("ITEM_NAME", itemName.getText().toString());
         Intent intent = new Intent(this, ItemFormPage3.class);
