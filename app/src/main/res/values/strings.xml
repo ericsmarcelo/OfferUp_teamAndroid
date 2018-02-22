@@ -40,4 +40,16 @@
     <string name="label_2">2</string>
     <string name="label_3">3</string>
     <string name="label_4">4</string>
+  
+    <string name="next">Next</string>
+    <string name="description">Enter a description for your item</string>
+    <string name="spin">Choose a category</string>
+    <string name="post">Post Item</string>
+    <string name="step1">Step 1 of 4</string>
+    <string name="step2">Step 2 of 4</string>
+    <string name="step3">Step 3 of 4</string>
+    <string name="step4">Step 4 of 4</string>
+    <string name="photo">Add photos of item</string>
+    <string name="category">Select Category</string>
+
 </resources>

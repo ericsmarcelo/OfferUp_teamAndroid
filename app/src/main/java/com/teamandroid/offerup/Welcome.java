@@ -65,6 +65,10 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
             Intent intent = new Intent (this, Registration.class);
             startActivity(intent);
             return true;
+        }else if (id ==R.id.action_postform) {
+            Intent intent = new Intent(this, ItemFormPage1.class);
+            startActivity(intent);
+            return true;
         }else if (id == R.id.action_googleIn) {
             Intent intent = new Intent (this, GoogleInActivity.class);
             startActivity(intent);
@@ -72,6 +76,10 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
         }
         else if (id == R.id.action_profile) {
             Intent intent = new Intent(this, UserProfile.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.action_postform) {
+            Intent intent = new Intent(this, ItemFormPage1.class);
             startActivity(intent);
         }
 

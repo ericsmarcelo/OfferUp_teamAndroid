@@ -1,5 +1,6 @@
 package com.teamandroid.offerup;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ public class Post {
     private String condition;
     private double price;
     private String image;
+    private String owner;
 
     //default constructor
     public Post() { }
@@ -49,6 +51,10 @@ public class Post {
         return image;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
     //Setters
     public void setDescription(String newDescription) {
         description = newDescription;
@@ -62,11 +68,20 @@ public class Post {
         category = newCategory;
     }
 
+
+    public void setCondition(String newCondition) {
+        condition = newCondition;
+    }
+
     public void setPrice(double newPrice) {
         price = newPrice;
     }
 
     public void setImage(String newImage) {
         image = newImage;
+    }
+
+    public void setOwner(String newOwner) {
+        owner = newOwner;
     }
 }
