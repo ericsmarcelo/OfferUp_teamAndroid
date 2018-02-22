@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,7 +18,7 @@ public class ItemFormPage1 extends AppCompatActivity {
     private String image;
 
     private FirebaseAuth fbAuth;
-    private FirebaseAuth.AuthStateListener authListener;
+    //private FirebaseAuth.AuthStateListener authListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,21 +31,24 @@ public class ItemFormPage1 extends AppCompatActivity {
 
         fbAuth = FirebaseAuth.getInstance();
         FirebaseUser user = fbAuth.getCurrentUser();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        fbAuth.addAuthStateListener(authListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if(authListener != null) {
-            fbAuth.removeAuthStateListener(authListener);
+        if (user == null) {
+            Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
         }
     }
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        fbAuth.addAuthStateListener(authListener);
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        if(authListener != null) {
+//            fbAuth.removeAuthStateListener(authListener);
+//        }
+//    }
 
     public void toPageTwo(View view) {
         String data = itemName.getText().toString();
