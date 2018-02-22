@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -81,9 +82,12 @@ public class ItemFormPage4 extends AppCompatActivity {
 
     // finish posting the item
     public void toHome (View view) {
+        // get unique id with push() function, we don't actually add any data here!
+        String uniqueID = fbDatabase.getReference().child("images").push().getKey();
+
         // upload image to firebase storage, get uri back
         fbStorage = FirebaseStorage.getInstance();
-        StorageReference imagesRef = fbStorage.getReference().child("images");
+        StorageReference imagesRef = fbStorage.getReference().child("images/"+uniqueID+".png");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Bitmap postImage = (Bitmap)b.getBundle("IMAGE").get("data");
@@ -130,30 +134,25 @@ public class ItemFormPage4 extends AppCompatActivity {
                 userPosts.add(postKey);
                 userRef.child("posts").setValue(userPosts);
 
+                Toast.makeText(ItemFormPage4.this, "Finished Post Upload", Toast.LENGTH_SHORT).show();
+
+                // go back to welcome page
+                // in future, make it go back to view the posting
+                Intent intent = new Intent(ItemFormPage4.this, Welcome.class);
+                startActivity(intent);
             }
         });
-
-
-        // add post to the Posts database entry
-
-
-        // add post to user post lists
-
-
-
-        // go back to welcome page
-        // in future, make it go back to view the posting
-        Intent intent = new Intent(this, Welcome.class);
-        startActivity(intent);
     }
 
     ValueEventListener userPostListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            if (dataSnapshot.getValue(ArrayList.class) != null) {
+            GenericTypeIndicator<ArrayList<Object>> t = new GenericTypeIndicator<ArrayList<Object>>() {};
+            if (dataSnapshot.getValue(t) != null) {
                 // only set userPosts to current firebase user post list if such list exists
                 // if the user has no current posts, there will be no list in firebase, so we don't set it
-                userPosts = new ArrayList<Object>(dataSnapshot.getValue(ArrayList.class));
+                //userPosts = new ArrayList<Object>(dataSnapshot.getValue(ArrayList.class));
+                userPosts = dataSnapshot.getValue(t);
             }
         }
 
