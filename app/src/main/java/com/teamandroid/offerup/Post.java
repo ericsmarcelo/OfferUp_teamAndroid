@@ -10,6 +10,7 @@ public class Post {
     private String condition;
     private double price;
     private String image;
+    private String owner;
 
     //default constructor
     public Post() { }
@@ -48,6 +49,10 @@ public class Post {
         return image;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
     //Setters
     public void setDescription(String newDescription) {
         description = newDescription;
@@ -71,5 +76,9 @@ public class Post {
 
     public void setImage(String newImage) {
         image = newImage;
+    }
+
+    public void setOwner(String newOwner) {
+        owner = newOwner;
     }
 }

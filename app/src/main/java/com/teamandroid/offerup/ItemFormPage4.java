@@ -16,7 +16,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -34,6 +38,8 @@ public class ItemFormPage4 extends AppCompatActivity {
     FirebaseAuth fbAuth;
     FirebaseUser fbUser;
     FirebaseStorage fbStorage;
+
+    List<Object> userPosts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +59,17 @@ public class ItemFormPage4 extends AppCompatActivity {
         fbAuth = FirebaseAuth.getInstance();
         fbUser = fbAuth.getCurrentUser();
 
+        if (fbUser == null) {
+            // no logged in user, go back to home activity
+            Toast.makeText(this, "Error, user not logged in.", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, Welcome.class);
+            startActivity(intent);
+        }
+
+        // initialize user post list for later use in ToHome function
+        userPosts = new ArrayList<>();
+        fbDatabase.getReference().child("users").child(fbUser.getUid()).child("posts").addListenerForSingleValueEvent(userPostListener);
+
         TextView tempItemName = findViewById(R.id.tempItemName);
         TextView tempPrice = findViewById(R.id.tempPrice);
         TextView tempCategory = findViewById(R.id.tempCategory);
@@ -61,24 +78,6 @@ public class ItemFormPage4 extends AppCompatActivity {
         tempPrice.setText(String.format(Locale.getDefault(),"%f", b.getFloat("ITEM_PRICE")));
         tempCategory.setText(b.getString("CATEGORY"));
     }
-
-//    public void toPageOne(View view) {
-//        Intent intent = new Intent(this, ItemFormPage1.class);
-//        intent.putExtras(b);
-//        startActivity(intent);
-//    }
-//
-//    public void toPageTwo(View view) {
-//        Intent intent = new Intent(this, ItemFormPage2.class);
-//        intent.putExtras(b);
-//        startActivity(intent);
-//    }
-//
-//    public void toPageThree(View view) {
-//        Intent intent = new Intent(this, ItemFormPage3.class);
-//        intent.putExtras(b);
-//        startActivity(intent);
-//    }
 
     // finish posting the item
     public void toHome (View view) {
@@ -102,26 +101,38 @@ public class ItemFormPage4 extends AppCompatActivity {
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // Get url of image from storage snapshot
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
                 String downloadString = downloadUrl.toString();
 
+                // create Post object for storing in database
                 Post newPost = new Post();
                 newPost.setItemName(b.getString("ITEM_NAME"));
                 newPost.setPrice(b.getFloat("ITEM_PRICE"));
                 newPost.setDescription(b.getString("ITEM_DESC"));
                 newPost.setCondition(b.getString("ITEM_COND"));
                 newPost.setImage(downloadString);
+                newPost.setOwner(fbUser.getUid());
 
                 List<String> itemCategories = new ArrayList<>();
-                itemCategories.add(b.getString("ITEM_CATEGORY"));
+                itemCategories.add(b.getString("CATEGORY"));
                 newPost.setCategory(itemCategories);
 
+                // upload the Post object to database at auto-generated child key
+                DatabaseReference postRef = fbDatabase.getReference().child("posts").push();
+                postRef.setValue(newPost);
 
+                // get key of post and save it in the user Posts list
+                String postKey = postRef.getKey();
+                DatabaseReference userRef = fbDatabase.getReference().child("users").child(fbUser.getUid());
+                //userPosts = new ArrayList<>();
+                //userRef.child("posts").addListenerForSingleValueEvent(userPostListener);
+                userPosts.add(postKey);
+                userRef.child("posts").setValue(userPosts);
 
             }
         });
 
-//        imagesRef.putBytes(b.getBundle("IMAGE").get("data"));
 
         // add post to the Posts database entry
 
@@ -135,4 +146,22 @@ public class ItemFormPage4 extends AppCompatActivity {
         Intent intent = new Intent(this, Welcome.class);
         startActivity(intent);
     }
+
+    ValueEventListener userPostListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            if (dataSnapshot.getValue(ArrayList.class) != null) {
+                // only set userPosts to current firebase user post list if such list exists
+                // if the user has no current posts, there will be no list in firebase, so we don't set it
+                userPosts = new ArrayList<Object>(dataSnapshot.getValue(ArrayList.class));
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            // do nothing
+        }
+    };
 }
+
+
