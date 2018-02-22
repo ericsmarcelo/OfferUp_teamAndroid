@@ -43,6 +43,10 @@ public class Welcome extends AppCompatActivity {
             Intent intent = new Intent (this, Registration.class);
             startActivity(intent);
             return true;
+        }else if (id ==R.id.action_postform) {
+            Intent intent = new Intent(this, ItemFormPage1.class);
+            startActivity(intent);
+            return true;
         }else if (id == R.id.action_googleIn) {
             Intent intent = new Intent (this, GoogleInActivity.class);
             startActivity(intent);
