@@ -75,7 +75,7 @@ public class GoogleInActivity extends AppCompatActivity implements GoogleApiClie
                 .requestProfile()
                 .build();
 
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
+        googleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
                 .build();
@@ -160,10 +160,10 @@ public class GoogleInActivity extends AppCompatActivity implements GoogleApiClie
 
     }
     //Sign In
-
     public void googleSignIn(View view) {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
+
     }
 
     @Override
@@ -175,6 +175,8 @@ public class GoogleInActivity extends AppCompatActivity implements GoogleApiClie
             if(result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 authWithFirebase(account);
+                Intent intent = new Intent(this, NavigationDrawerActivity.class);
+                startActivity(intent);
             } else {
                 this.notifyUser("Google sign-in failed");
             }
@@ -212,6 +214,9 @@ public class GoogleInActivity extends AppCompatActivity implements GoogleApiClie
 
             }
         });
+        Intent intent = new Intent(this, Welcome.class);
+        startActivity(intent);
+
     }
 
 }

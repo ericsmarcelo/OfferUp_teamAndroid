@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,6 +18,7 @@ public class ItemFormPage1 extends AppCompatActivity {
     private String image;
 
     private FirebaseAuth fbAuth;
+    //private FirebaseAuth.AuthStateListener authListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,6 @@ public class ItemFormPage1 extends AppCompatActivity {
             b = getIntent().getExtras();
         }
         itemName = (EditText) findViewById(R.id.itemName);
-
         //fbAuth = FirebaseAuth.getInstance();
         //FirebaseUser user = fbAuth.getCurrentUser();
     }
@@ -43,6 +44,7 @@ public class ItemFormPage1 extends AppCompatActivity {
         if(b.getString("ITEM_NAME") != null) {
             itemName.setText(b.getString("ITEM_NAME"));
         }
+
     }
 
     public void toPageTwo(View view) {
