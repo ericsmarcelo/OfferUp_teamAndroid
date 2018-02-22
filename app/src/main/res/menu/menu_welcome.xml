@@ -12,11 +12,7 @@
         android:orderInCategory="102"
         android:title="@string/registration" />
     <item
-<<<<<<< HEAD
         android:id="@+id/action_postform"
-=======
-        android:id="@+id/action_post"
->>>>>>> 4cbde25d695a01739f623a42d143318dd75dd8b4
         android:orderInCategory="103"
         android:title="Post Form" />
     <item

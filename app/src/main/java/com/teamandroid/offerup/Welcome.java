@@ -78,7 +78,7 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
             Intent intent = new Intent(this, UserProfile.class);
             startActivity(intent);
         }
-        else if (id == R.id.action_post) {
+        else if (id == R.id.action_postform) {
             Intent intent = new Intent(this, ItemFormPage1.class);
             startActivity(intent);
         }
