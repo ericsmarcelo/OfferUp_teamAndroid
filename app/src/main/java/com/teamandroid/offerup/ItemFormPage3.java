@@ -5,7 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -39,15 +43,16 @@ public class ItemFormPage3 extends AppCompatActivity {
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
-        if(b.getString("PRICE") != null) {
+        if (b.getString("PRICE") != null) {
             itemPrice.setText(b.getString("PRICE"));
         }
-        if(b.getString("ITEM_COND") != null) {
+        if (b.getString("ITEM_COND") != null) {
             itemCond.setText(b.getString("ITEM_COND"));
         }
     }
+
 
     public void toPageOne(View view) {
         String price = itemPrice.getText().toString();
@@ -55,6 +60,7 @@ public class ItemFormPage3 extends AppCompatActivity {
             b.putFloat("ITEM_PRICE", Float.valueOf(price));
         }
         b.putString("ITEM_COND", itemCond.getText().toString());
+
         Intent intent = new Intent(this, ItemFormPage1.class);
         intent.putExtras(b);
         startActivity(intent);
@@ -72,6 +78,16 @@ public class ItemFormPage3 extends AppCompatActivity {
     }
 
     public void toPageFour(View view) {
+        if(itemPrice.getText().length() == 0) {
+            Toast.makeText(this, "Please add a price.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(itemCond.getText().length() == 0) {
+            Toast.makeText(this, "Please add item condition.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String price = itemPrice.getText().toString();
         if(price != null && price.length() > 0) {
             b.putFloat("ITEM_PRICE", Float.valueOf(price));

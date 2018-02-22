@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,6 +53,10 @@ public class ItemFormPage2 extends AppCompatActivity {
         startActivity(intent);
     }
     public void toPageThree(View view) {
+        if(itemDesc.getText().length() == 0) {
+            Toast.makeText(this, "Please add item description.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         b.putString("ITEM_DESC", itemDesc.getText().toString());
         Intent intent = new Intent(this, ItemFormPage3.class);
         intent.putExtras(b);

@@ -71,17 +71,17 @@ public class ItemFormPage1 extends AppCompatActivity {
     }
 
     public void toPageTwo(View view) {
-        if(itemName.getText().toString() == "") {
-            Toast.makeText(this, "Please add item name.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        bundle.putString("ITEM_NAME", itemName.getText().toString());
 
         if(bundle.getBundle("IMAGE") == null) {
             Toast.makeText(this, "Please add image.", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        if(itemName.getText().length() == 0) {
+            Toast.makeText(this, "Please add item name.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        bundle.putString("ITEM_NAME", itemName.getText().toString());
         Intent intent = new Intent(this, ItemFormPage2.class);
         intent.putExtras(bundle);
         startActivity(intent);
