@@ -5,15 +5,21 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -44,6 +50,7 @@ public class UserProfile extends AppCompatActivity {
     private FirebaseDatabase database;
     static private User dbUser;
     static RatingBar ratingBar;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,38 +106,32 @@ public class UserProfile extends AppCompatActivity {
         if(user != null)
         {
             database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
-
-            // add EditProfile button if user is logged in
-            // *** we SHOULD check if logged in user matches profile ID ***
-            ImageButton editProfileButton = new ImageButton(this);
-            editProfileButton.setImageResource(R.drawable.ic_edit);
-
-            // create parameter variable to store the positioning of the button
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
-            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-            // add the Button to the layout
-            RelativeLayout profileLayout = findViewById(R.id.content_user_profile);
-            profileLayout.addView(editProfileButton, params);
-
-            // add click listener to editProfile button to send user to EditProfile activity
-            editProfileButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(UserProfile.this, EditProfile.class);
-                    startActivity(intent);
-                }
-            });
         }
         else {
             // user not logged in
-            userName.setText("Shweti Mahajan");
-            userEmail.setText("shwetimahajan1993@gmail.com");
-            userPhone.setText("(984) 528-1129");
+            userName.setText(" ");
+            userEmail.setText(" ");
+            userPhone.setText(" ");
             ratingBar.setRating(3.5f);
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == 1) {
+            // 1 is the id for EditProfile
+            Intent intent = new Intent(UserProfile.this, EditProfile.class);
+            startActivity(intent);
+        }
+        return true;
     }
 
     static public void addRatingToUser(float newRating) {
@@ -190,6 +191,19 @@ public class UserProfile extends AppCompatActivity {
 //                    profileState.setText(userState);
 //                }
 //                profileRating.setText(String.valueOf(userRating));
+
+                // add edit profile to action bar if profile email matches logged in user
+                // only check if the menu item has not yet been added to action bar
+                if (menu.findItem(1) == null) {
+                    FirebaseUser firebaseUser = fbAuth.getCurrentUser();
+                    if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
+                        // if profile email matches current logged in user email, then show edit profile button
+                        MenuItem editProfile = menu.add(1, 1, 101, "Edit Profile");
+                        editProfile.setIcon(R.drawable.ic_edit_profile);
+                        editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                    }
+                }
+
             }
         }
 
