@@ -169,7 +169,7 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
 
     //@Override
     public void onItemClick(DataModel item) {
-
+        // launch activity to view specific item
         Toast.makeText(getApplicationContext(), item.text + " is clicked", Toast.LENGTH_SHORT).show();
 
     }
