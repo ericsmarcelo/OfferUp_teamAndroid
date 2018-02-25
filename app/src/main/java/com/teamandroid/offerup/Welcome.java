@@ -58,6 +58,7 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
         if (requestCode == AUTH_REQUEST && resultCode == RESULT_OK) {
             if(data.getBooleanExtra("loginStatus", true)) {
                 fbUser = fbAuth.getCurrentUser();
+                menu.findItem(R.id.action_profile).setVisible(true);
             }
         }
     }
