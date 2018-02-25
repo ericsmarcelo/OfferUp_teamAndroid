@@ -24,6 +24,8 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
     RecyclerView recyclerView;
     ArrayList<DataModel> arrayList;
 
+    static final int AUTH_REQUEST = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,19 +54,50 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == AUTH_REQUEST && resultCode == RESULT_OK) {
+            if(data.getBooleanExtra("loginStatus", true)) {
+                fbUser = fbAuth.getCurrentUser();
+            }
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // set global menu variable pointing to current menu
         this.menu = menu;
+
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_welcome, menu);
         if (fbUser != null) {
             // if user is logged in, hide the "log in" option in menu
-            MenuItem loginButton = menu.findItem(R.id.action_authentication);
-            loginButton.setVisible(false);
+            menu.findItem(R.id.action_authentication).setVisible(false);
+            menu.findItem(R.id.action_registration).setVisible(false);
         }
         else {
-            // if user is not logged in, hide the "log out" option in menu
-            MenuItem logoutButton = menu.findItem(R.id.action_logout);
-            logoutButton.setVisible(false);
+            // if user is not logged in, hide the "log out" and "profile" options in menu
+            menu.findItem(R.id.action_logout).setVisible(false);
+            menu.findItem(R.id.action_profile).setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // function called every time someone opens the menu
+        if (fbUser != null) {
+            // if user is logged in, hide the "log in" option in menu
+            menu.findItem(R.id.action_authentication).setVisible(false);
+            menu.findItem(R.id.action_registration).setVisible(false);
+            menu.findItem(R.id.action_logout).setVisible(true);
+            menu.findItem(R.id.action_profile).setVisible(true);
+        }
+        else {
+            // if user is not logged in, hide the "log out" and "profile" options in menu
+            menu.findItem(R.id.action_logout).setVisible(false);
+            menu.findItem(R.id.action_profile).setVisible(false);
+            menu.findItem(R.id.action_authentication).setVisible(true);
+            menu.findItem(R.id.action_registration).setVisible(true);
         }
         return true;
     }
@@ -82,7 +115,7 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
         }
         else if (id == R.id.action_authentication) {
             Intent intent = new Intent(this, Authentication.class);
-            startActivity(intent);
+            startActivityForResult(intent, AUTH_REQUEST);
             return true;
         }
         else if (id == R.id.action_registration) {
@@ -91,26 +124,38 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
             return true;
         }
         else if (id ==R.id.action_postform) {
-            Intent intent = new Intent(this, ItemFormPage1.class);
-            startActivity(intent);
-            return true;
+            if (fbUser == null) {
+                // if not logged in, make user log in first
+                Toast.makeText(this, "Please log in to post an item.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, Authentication.class);
+                startActivityForResult(intent, AUTH_REQUEST);
+                return true;
+            }
+            else {
+                // if user logged in, take them to post item form
+                Intent intent = new Intent(this, ItemFormPage1.class);
+                startActivity(intent);
+                return true;
+            }
         }
         else if (id == R.id.action_profile) {
             Intent intent = new Intent(this, UserProfile.class);
             startActivity(intent);
-        }
-        else if (id == R.id.action_postform) {
-            Intent intent = new Intent(this, ItemFormPage1.class);
-            startActivity(intent);
+            return true;
         }
         else if (id == R.id.action_logout) {
+            // sign out, give notice to user
             fbAuth.signOut();
             fbUser = null;
             Toast.makeText(this, "Signed Out", Toast.LENGTH_SHORT).show();
 
             // After logged out, change menu to show log in button and hide log out button
             menu.findItem(R.id.action_logout).setVisible(false);
+            menu.findItem(R.id.action_profile).setVisible(false);
             menu.findItem(R.id.action_authentication).setVisible(true);
+            menu.findItem(R.id.action_registration).setVisible(true);
+
+            return true;
         }
 //        else if (id == R.id.action_googleIn) {
 //            Intent intent = new Intent (this, GoogleInActivity.class);

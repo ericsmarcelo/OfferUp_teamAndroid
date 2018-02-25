@@ -4,6 +4,7 @@
     <string name="login_logout">Login / Logout</string>
     <string name="login">Login</string>
     <string name="logout">Logout</string>
+    <string name="login_title">Log In To OfferUp</string>
     <string name="title_activity_authentication">Login / Logout</string>
     <string name="sign_out">Sign Out</string>
     <string name="sign_in">Sign In</string>
@@ -11,6 +12,7 @@
     <string name="password_required">Password (Required)</string>
     <string name="email">Email</string>
     <string name="reset_password">Reset Password</string>
+    <string name="forgot_password_hint">Forgot your password? Type your email and tap the \"Reset Password\" button below.</string>
     <string name="create_account">Create Account</string>
     <string name="offerup">OfferUp</string>
     <string name="title_activity_registration">Registration</string>
@@ -28,9 +30,10 @@
     <string name="google_sign_out">Google Sign Out</string>
     <string name="google_sign_in">Google Sign-in</string>
     <string name="google_in">Google In</string>
-    <string name="registration">Registration</string>
+    <string name="registration">Create An Account</string>
     <string name="google_logout">Google Logout</string>
     <string name="google_login">Google Login</string>
+    <string name="menu_postform">Post An Item</string>
     <string name="todo">TODO</string>
     <string name="title_activity_google_in">Google Login </string>
 
