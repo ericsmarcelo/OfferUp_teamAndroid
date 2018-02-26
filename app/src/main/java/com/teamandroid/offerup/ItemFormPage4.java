@@ -136,9 +136,9 @@ public class ItemFormPage4 extends AppCompatActivity {
 
                 Toast.makeText(ItemFormPage4.this, "Finished Post Upload", Toast.LENGTH_SHORT).show();
 
-                // go back to welcome page
+                // go back to home page
                 // in future, make it go back to view the posting
-                Intent intent = new Intent(ItemFormPage4.this, Welcome.class);
+                Intent intent = new Intent(ItemFormPage4.this, HomePage.class);
                 startActivity(intent);
             }
         });

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 public class HomePage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, RecyclerViewAdapter.ItemListener {
+
     public FirebaseAuth fbAuth;
     public FirebaseUser fbUser;
     NavigationView navigationView;
@@ -76,9 +77,6 @@ public class HomePage extends AppCompatActivity
 
         View header = navigationView.getHeaderView(0);
 
-
-
-
         fbAuth = FirebaseAuth.getInstance();
         fbUser = fbAuth.getCurrentUser();
 
@@ -110,6 +108,14 @@ public class HomePage extends AppCompatActivity
         }
         AutoFitGridLayoutManager layoutManager = new AutoFitGridLayoutManager(this, 500);
         recyclerView.setLayoutManager(layoutManager);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // update navigation drawer based on user log in status
+        updateNav();
     }
 
     @Override
@@ -179,17 +185,13 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.signup).setVisible(true);
             navMenu.findItem(R.id.logout).setVisible(false);
             navMenu.findItem(R.id.profile).setVisible(false);
-
-
-
-
         }
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        Menu navMenu =navigationView.getMenu();
+        Menu navMenu = navigationView.getMenu();
         // function called every time someone opens the menu
         if (fbUser != null) {
             // if user is logged in, hide the "log in" option in menu
@@ -243,6 +245,7 @@ public class HomePage extends AppCompatActivity
 
         else if (id == R.id.action_profile) {
             Intent intent = new Intent(this, UserProfile.class);
+            intent.putExtra("profileUid", fbUser.getUid());
             startActivity(intent);
             return true;
         }
@@ -257,6 +260,7 @@ public class HomePage extends AppCompatActivity
             menu.findItem(R.id.action_profile).setVisible(false);
             menu.findItem(R.id.action_authentication).setVisible(true);
             menu.findItem(R.id.action_registration).setVisible(true);
+            updateNav();
 
             return true;
         }
@@ -273,7 +277,6 @@ public class HomePage extends AppCompatActivity
     public void onItemClick(DataModel item) {
         // launch activity to view specific item
         Toast.makeText(getApplicationContext(), item.text + " is clicked", Toast.LENGTH_SHORT).show();
-
     }
 
 
@@ -286,6 +289,7 @@ public class HomePage extends AppCompatActivity
 
         if (id == R.id.profile) {
             Intent intent = new Intent(this, UserProfile.class);
+            intent.putExtra("profileUid", fbUser.getUid());
             startActivity(intent);
         } else if (id == R.id.logout) {
             fbAuth.signOut();
@@ -297,6 +301,7 @@ public class HomePage extends AppCompatActivity
             menu.findItem(R.id.action_profile).setVisible(false);
             menu.findItem(R.id.action_authentication).setVisible(true);
             menu.findItem(R.id.action_registration).setVisible(true);
+            updateNav();
 
         } else if (id == R.id.login) {
             Intent intent = new Intent(this, Authentication.class);
@@ -318,6 +323,26 @@ public class HomePage extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    // updates navigation drawer based on user log in status
+    // avoids having the same lines of code everywhere
+    public void updateNav() {
+        Menu navMenu = navigationView.getMenu();
+        if (fbUser != null) {
+            // if user is logged in, hide the "log in" option in menu
+            navMenu.findItem(R.id.login).setVisible(false);
+            navMenu.findItem(R.id.signup).setVisible(false);
+            navMenu.findItem(R.id.logout).setVisible(true);
+            navMenu.findItem(R.id.profile).setVisible(true);
+        }
+        else {
+            // if user is not logged in, hide the "log out" and "profile" options in menu
+            navMenu.findItem(R.id.login).setVisible(true);
+            navMenu.findItem(R.id.signup).setVisible(true);
+            navMenu.findItem(R.id.logout).setVisible(false);
+            navMenu.findItem(R.id.profile).setVisible(false);
+        }
     }
 
 

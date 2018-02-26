@@ -160,4 +160,10 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
         Toast.makeText(getApplicationContext(), item.text + " is clicked", Toast.LENGTH_SHORT).show();
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fbUser = fbAuth.getCurrentUser();
+    }
 }
