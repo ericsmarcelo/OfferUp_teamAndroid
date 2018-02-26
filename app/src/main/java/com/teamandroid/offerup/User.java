@@ -10,6 +10,7 @@ public class User {
     private String phoneNumber;
     private String city;
     private String state;
+    private String photo;
     private double rating;
     private int ratingCount;
     private List<Object> posts;
@@ -23,6 +24,7 @@ public class User {
         this.phoneNumber = "";
         this.city = "";
         this.state = "";
+        this.photo = "";
         this.rating = 0.0;
         this.ratingCount = 0;
         this.posts = new ArrayList<>();
@@ -47,6 +49,10 @@ public class User {
 
     public String getState() {
         return state;
+    }
+
+    public String getPhoto() {
+        return photo;
     }
 
     public double getRating() {
@@ -79,7 +85,11 @@ public class User {
     }
 
     public void setState(String newState) {
-        state   = newState;
+        state = newState;
+    }
+
+    public void setPhoto(String newPhoto) {
+        photo = newPhoto;
     }
 
     // completely overwrites rating
