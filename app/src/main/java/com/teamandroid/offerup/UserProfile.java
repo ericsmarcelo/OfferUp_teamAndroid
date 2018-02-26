@@ -50,6 +50,7 @@ public class UserProfile extends AppCompatActivity {
     private FirebaseDatabase database;
     static private User dbUser;
     static RatingBar ratingBar;
+    private boolean flag;
     private Menu menu;
 
     @Override
@@ -66,9 +67,11 @@ public class UserProfile extends AppCompatActivity {
         LinearLayout rating = (LinearLayout) findViewById(R.id.rating);
         //RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
         ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
+        flag= true;
         rating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(flag)
                 new RatingBarDialog().show(getFragmentManager(),"rating");
             }
         });
@@ -198,8 +201,9 @@ public class UserProfile extends AppCompatActivity {
                     FirebaseUser firebaseUser = fbAuth.getCurrentUser();
                     if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
                         // if profile email matches current logged in user email, then show edit profile button
+                        flag =false;
                         MenuItem editProfile = menu.add(1, 1, 101, "Edit Profile");
-                        editProfile.setIcon(R.drawable.ic_edit_profile);
+                        editProfile.setIcon(R.drawable.edit);
                         editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                     }
                 }

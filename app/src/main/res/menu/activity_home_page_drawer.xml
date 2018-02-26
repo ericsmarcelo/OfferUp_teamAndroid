@@ -3,21 +3,21 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/home"
             android:icon="@drawable/ic_home"
             android:title="Home"
             android:checked="true"
             />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/notifications"
             android:icon="@drawable/ic_notifications"
             android:title="Notifications" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/posts"
             android:icon="@drawable/ic_offers"
             android:title="My Offers" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/settings"
             android:icon="@drawable/ic_menu_manage"
             android:title="Settings" />
     </group>
@@ -26,15 +26,15 @@
         <menu>
 
             <item
-                android:id="@+id/view_profile"
+                android:id="@+id/profile"
                 android:icon="@drawable/ic_person"
                 android:title="View Profile" />
             <item
-                android:id="@+id/nav_send"
+                android:id="@+id/message"
                 android:icon="@drawable/ic_email"
                 android:title="Messages" />
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/share"
                 android:icon="@drawable/ic_menu_share"
                 android:title="Share" />
         </menu>
@@ -44,5 +44,13 @@
         android:id="@+id/logout"
         android:icon="@drawable/ic_logout"
         android:title="Log out" />
+    <item
+        android:id="@+id/login"
+        android:icon="@drawable/ic_login"
+        android:title="Log in" />
+    <item
+        android:id="@+id/signup"
+        android:icon="@drawable/ic_signup"
+        android:title="Sign up" />
 
 </menu>
