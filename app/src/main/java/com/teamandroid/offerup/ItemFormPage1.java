@@ -2,6 +2,8 @@ package com.teamandroid.offerup;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +17,9 @@ import android.widget.Toast;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class ItemFormPage1 extends AppCompatActivity {
 
@@ -43,6 +48,7 @@ public class ItemFormPage1 extends AppCompatActivity {
         }
 
         Button cameraButton = findViewById(R.id.cameraButton);
+        Button galleryButton = findViewById(R.id.galleryButton);
         itemName = findViewById(R.id.itemName);
         imageView = findViewById(R.id.imageView);
 
@@ -56,23 +62,50 @@ public class ItemFormPage1 extends AppCompatActivity {
             }
         });
 
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent getPictureIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                getPictureIntent.setType("image/*");
+                if (getPictureIntent.resolveActivity(getPackageManager()) != null) {
+
+                    startActivityForResult(getPictureIntent, REQUEST_IMAGE_GALLERY);
+                }
+            }
+        });
+
         bundle = new Bundle();
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        bundle = new Bundle();
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
             Bitmap imageBitmap = (Bitmap)data.getExtras().get("data");
             imageView.setImageBitmap(imageBitmap);
 
             bundle.putBundle("IMAGE", data.getExtras());
         }
+        else if (requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK && data != null) {
+            try {
+                Uri imageUri = data.getData();
+                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                Bitmap imageBitmap = BitmapFactory.decodeStream(imageStream);
+                imageView.setImageBitmap(imageBitmap);
+
+                bundle.putString("IMAGE_URI", data.getData().toString());
+            } catch(FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Something went wrong.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public void toPageTwo(View view) {
 
-        if(bundle.getBundle("IMAGE") == null) {
+        if(bundle.getBundle("IMAGE") == null && bundle.getString("IMAGE_URI") == null) {
             Toast.makeText(this, "Please add image.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -83,20 +116,6 @@ public class ItemFormPage1 extends AppCompatActivity {
         }
         bundle.putString("ITEM_NAME", itemName.getText().toString());
         Intent intent = new Intent(this, ItemFormPage2.class);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
-    public void toPageThree(View view) {
-        bundle.putString("ITEM_NAME", itemName.getText().toString());
-        Intent intent = new Intent(this, ItemFormPage3.class);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
-    public void toPageFour(View view) {
-        bundle.putString("ITEM_NAME", itemName.getText().toString());
-        Intent intent = new Intent(this, ItemFormPage4.class);
         intent.putExtras(bundle);
         startActivity(intent);
     }
