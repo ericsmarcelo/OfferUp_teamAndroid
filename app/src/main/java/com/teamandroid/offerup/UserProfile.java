@@ -43,9 +43,11 @@ import com.squareup.picasso.Picasso;
 
 public class UserProfile extends AppCompatActivity {
 
+    private String profileUid;
     private TextView userName;
     private TextView userEmail;
     private TextView userPhone;
+    private TextView userCityState;
     private FirebaseAuth fbAuth;
     private FirebaseDatabase database;
     static private User dbUser;
@@ -58,10 +60,16 @@ public class UserProfile extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // profileUid is the ID of the profile we are viewing, doesn't have to be the same as
+        // the current logged in user
+        profileUid = getIntent().getStringExtra("profileUid");
+
         //User Profile display
         userName = (TextView) findViewById(R.id.userNameText);
         userEmail = (TextView) findViewById(R.id.userEmailText);
         userPhone = (TextView) findViewById(R.id.userPhoneText);
+        userCityState = findViewById(R.id.userLocationText);
 
         LinearLayout rating = (LinearLayout) findViewById(R.id.rating);
         //RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
@@ -99,19 +107,23 @@ public class UserProfile extends AppCompatActivity {
 
         Picasso.with(getApplicationContext())
                 .load("http://via.placeholder.com/350x350")
-                .transform(new RoundedTransformation(100,10))
+                .transform(new RoundedTransformation(50,10))
                 .fit()
                 .centerCrop().into(userImg);
 
+        // we should receive userid from intent here in case we are viewing a profile that isn't our own
+        // then we can get that user's information instead of our logged in accounts information
         if(user != null)
         {
-            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+//            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+            database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
         }
         else {
             // user not logged in
             userName.setText(" ");
             userEmail.setText(" ");
             userPhone.setText(" ");
+            userCityState.setText(" ");
             ratingBar.setRating(3.5f);
         }
 
@@ -158,7 +170,8 @@ public class UserProfile extends AppCompatActivity {
         super.onRestart();
         FirebaseUser user = fbAuth.getCurrentUser();
         if (user != null) {
-            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+//            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+            database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
         }
 
     }
@@ -173,24 +186,24 @@ public class UserProfile extends AppCompatActivity {
                 userName.setText(dbUser.getName());
                 userEmail.setText(dbUser.getEmail());
                 String userPhoneNumber = dbUser.getPhoneNumber();
-//                String userCity = dbUser.getCity();
-//                String userState = dbUser.getState();
+                String userCity = dbUser.getCity();
+                String userState = dbUser.getState();
                 ratingBar.setRating((float)dbUser.getRating());
 
                 // set all text views to the value from user, granted that the value is not empty
-                if (userPhoneNumber != "") {
+                if (userPhoneNumber != null && !(userPhoneNumber.equals(""))) {
                     userPhone.setText(userPhoneNumber);
                 }
                 else {
-                    userPhone.setText("(000) 000-0000");
+                    userPhone.setText("No Phone Listed");
                 }
-//                if (userCity != "" || userCity != null) {
-//                    profileCity.setText(userCity);
-//                }
-//                if(userState != "" || userState != null) {
-//                    profileState.setText(userState);
-//                }
-//                profileRating.setText(String.valueOf(userRating));
+                if (userCity != null && !(userCity.equals("")) && userState != null && !(userState.equals(""))) {
+                    String cityAndState = userCity + ", " + userState;
+                    userCityState.setText(cityAndState);
+                }
+                else {
+                    userCityState.setText("No Location Listed");
+                }
 
                 // add edit profile to action bar if profile email matches logged in user
                 // only check if the menu item has not yet been added to action bar

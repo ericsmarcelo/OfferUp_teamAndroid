@@ -141,6 +141,7 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
         }
         else if (id == R.id.action_profile) {
             Intent intent = new Intent(this, UserProfile.class);
+            intent.putExtra("profileUid", fbUser.getUid());
             startActivity(intent);
             return true;
         }
