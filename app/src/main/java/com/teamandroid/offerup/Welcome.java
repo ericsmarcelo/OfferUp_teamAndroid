@@ -8,21 +8,32 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.app.ProgressDialog;
+import android.support.v7.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.ItemListener {
+public class Welcome extends AppCompatActivity {
 
     public FirebaseAuth fbAuth;
     public FirebaseUser fbUser;
     private Menu menu;
 
-    RecyclerView recyclerView;
-    ArrayList<DataModel> arrayList;
+    public RecyclerView recyclerView;
+    public RecyclerView.Adapter adapter;
+    public DatabaseReference mDatabase;
+    public ProgressDialog progressDialog;
+    public List<Upload> uploads;
+    public String DatabasePath = "posts";
 
     static final int AUTH_REQUEST = 1;
 
@@ -31,26 +42,39 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        fbAuth = FirebaseAuth.getInstance();
-        fbUser = fbAuth.getCurrentUser();
-
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        arrayList = new ArrayList<>();
-        arrayList.add(new DataModel("Item 1", R.drawable.battle, "#09A9FF"));
-        arrayList.add(new DataModel("Item 2", R.drawable.beer, "#3E51B1"));
-        arrayList.add(new DataModel("Item 3", R.drawable.ferrari, "#673BB7"));
-        arrayList.add(new DataModel("Item 4", R.drawable.jetpack_joyride, "#4BAA50"));
-        arrayList.add(new DataModel("Item 5", R.drawable.three_d, "#F94336"));
-        arrayList.add(new DataModel("Item 6", R.drawable.terraria, "#0A9B88"));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        progressDialog = new ProgressDialog(this);
+        uploads = new ArrayList<>();
 
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, arrayList, this);
-        recyclerView.setAdapter(adapter);
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+        mDatabase = FirebaseDatabase.getInstance().getReference(DatabasePath);
 
-        AutoFitGridLayoutManager layoutManager = new AutoFitGridLayoutManager(this, 500);
-        recyclerView.setLayoutManager(layoutManager);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                //dismissing the progress dialog
+                progressDialog.dismiss();
 
+                //iterating through all the values in database
+                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                    Upload upload = postSnapshot.getValue(Upload.class);
+                    uploads.add(upload);
+                }
+                //creating adapter
+                adapter = new RecyclerViewAdapter(getApplicationContext(), uploads);
+
+                //adding adapter to recyclerview
+                recyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                progressDialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -155,11 +179,11 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
     }
 
     //@Override
-    public void onItemClick(DataModel item) {
+    /*public void onItemClick(DataModel item) {
         // launch activity to view specific item
         Toast.makeText(getApplicationContext(), item.text + " is clicked", Toast.LENGTH_SHORT).show();
 
-    }
+    }*/
 
     @Override
     protected void onResume() {
