@@ -4,12 +4,6 @@
     tools:context="com.teamandroid.offerup.Welcome">
 
     <item
-        android:id="@+id/action_postform"
-        android:orderInCategory="101"
-        android:icon="@drawable/ic_post_item"
-        android:title="@string/menu_postform"
-        app:showAsAction="ifRoom|withText"/>
-    <item
         android:id="@+id/action_registration"
         android:orderInCategory="102"
         android:icon="@drawable/ic_registration"

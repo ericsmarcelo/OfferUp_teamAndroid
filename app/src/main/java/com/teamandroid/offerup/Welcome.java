@@ -124,21 +124,7 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
             startActivity(intent);
             return true;
         }
-        else if (id ==R.id.action_postform) {
-            if (fbUser == null) {
-                // if not logged in, make user log in first
-                Toast.makeText(this, "Please log in to post an item.", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, Authentication.class);
-                startActivityForResult(intent, AUTH_REQUEST);
-                return true;
-            }
-            else {
-                // if user logged in, take them to post item form
-                Intent intent = new Intent(this, ItemFormPage1.class);
-                startActivity(intent);
-                return true;
-            }
-        }
+
         else if (id == R.id.action_profile) {
             Intent intent = new Intent(this, UserProfile.class);
             intent.putExtra("profileUid", fbUser.getUid());

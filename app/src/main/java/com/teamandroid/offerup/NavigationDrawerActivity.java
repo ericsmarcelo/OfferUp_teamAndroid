@@ -102,16 +102,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
             startActivity(intent);
             return true;
 
-        } else if (id == R.id.navigation_profile) {
+        } else if (id == R.id.nav_camera) {
             Intent intent = new Intent(this, UserProfile.class);
             startActivity(intent);
             return true;
 
-        } else if (id == R.id.navigation_logout) {
+        } else if (id == R.id.nav_gallery) {
             Intent intent = new Intent(this, Authentication.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.navigation_google) {
+        } else if (id == R.id.nav_send) {
             Intent intent = new Intent(this, GoogleInActivity.class);
             startActivity(intent);
             return true;
