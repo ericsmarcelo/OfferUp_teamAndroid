@@ -12,22 +12,27 @@
     tools:showIn="@layout/activity_edit_profile">
 
     <TextView
+        android:id="@+id/editProfileText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editProfileText"
-        android:text="Edit Profile"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="72dp"
         android:gravity="center"
+        android:text="@string/edit_profile"
         android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textSize="24sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/editProfileText"
-        android:layout_marginTop="32dp"
-        android:padding="16dp"
-        android:orientation="vertical">
+        android:layout_marginTop="24dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -128,25 +133,16 @@
 
         </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/saveChangesButton"
-            android:text=" Save Changes"
-            android:drawableLeft="@drawable/ic_save"
-            android:layout_gravity="center"
-            android:layout_marginTop="32dp" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/restoreValuesButton"
-            android:text=" Reload Values"
-            android:drawableLeft="@drawable/ic_refresh"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp" />
-
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        app:srcCompat="@color/cardview_dark_background" />
 
 </RelativeLayout>

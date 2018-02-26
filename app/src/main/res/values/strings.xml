@@ -15,6 +15,7 @@
     <string name="forgot_password_hint">Forgot your password? Type your email and tap the \"Reset Password\" button below.</string>
     <string name="create_account">Create Account</string>
     <string name="profile_picture_description">User Profile Picture</string>
+    <string name="edit_profile">Edit Profile</string>
     <string name="offerup">OfferUp</string>
     <string name="title_activity_registration">Registration</string>
     <string name="name">(Name)</string>
