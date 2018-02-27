@@ -119,8 +119,18 @@ public class UserProfile extends AppCompatActivity {
         // then we can get that user's information instead of our logged in accounts information
         if(user != null)
         {
-//            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
-            database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
+
+            if (profileUid != null) {
+                database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
+            }
+            else {
+                // BAD!
+                // USERID SHOULD BE PASSED VIA INTENT TO THIS ACTIVITY
+                // THIS CURRENTLY GETS LOGGED IN USER INFO IF NO USERID IS PASSED IN,
+                // WHICH SHOULD NOT HAPPEN IF WE WANT TO VIEW A DIFFERENT USER PROFILE
+                database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+            }
+
         }
         else {
             // user not logged in

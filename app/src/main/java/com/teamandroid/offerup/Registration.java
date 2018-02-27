@@ -121,8 +121,9 @@ public class Registration extends AppCompatActivity {
                             database.getReference("users").child(uid).setValue(dbUser);
 
                             // go to profile activity (should change to home page later)
-                            Intent intent = new Intent(Registration.this, UserProfile.class);
-                            startActivity(intent);
+//                            Intent intent = new Intent(Registration.this, UserProfile.class);
+//                            startActivity(intent);
+                            finish();
                         }
                     }
                 });
