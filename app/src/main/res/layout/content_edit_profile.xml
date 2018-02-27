@@ -133,14 +133,47 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="36dp"
-            android:contentDescription="@string/profile_picture_description"
-            app:srcCompat="@color/cardview_dark_background" />
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/viewProfilePicture"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/profile_picture_description"
+                android:scaleType="fitStart"
+                app:srcCompat="@color/lightGrey" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginLeft="24dp">
+
+                <Button
+                    android:id="@+id/newPhotoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set New Photo"/>
+
+                <Button
+                    android:id="@+id/clearPhotoButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Clear Photo"/>
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
 
     </LinearLayout>
 

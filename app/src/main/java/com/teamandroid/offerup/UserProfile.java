@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -220,6 +221,16 @@ public class UserProfile extends AppCompatActivity {
                         editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                     }
                 }
+
+                // get user profile picture uri (as a string) from firebase
+                String photoString = dbUser.getPhoto();
+                if (!photoString.equals("")) {
+                    // if string exists (not empty) then load image into imageview
+                    Uri photoUrl = Uri.parse(photoString);
+                    ImageView profilePicture = findViewById(R.id.userpic);
+                    Picasso.with(UserProfile.this).load(photoUrl).into(profilePicture);
+                }
+                // if string empty, don't load anything
 
             }
         }
