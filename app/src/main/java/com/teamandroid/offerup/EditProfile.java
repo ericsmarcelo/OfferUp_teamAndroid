@@ -1,10 +1,18 @@
 package com.teamandroid.offerup;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,19 +21,29 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class EditProfile extends AppCompatActivity {
 
     private FirebaseDatabase fbDatabase;
     private FirebaseAuth fbAuth;
     private FirebaseUser fbUser;
+    private FirebaseStorage fbStorage;
     private User currentUser;
 
     private EditText editName;
@@ -36,9 +54,25 @@ public class EditProfile extends AppCompatActivity {
     private Button newPhotoButton;
     private Button clearPhotoButton;
 
+
+
     public final int SAVE_CHANGES_CODE = 1;
     public final int REVERT_CHANGES_CODE = 2;
     public final int EXIT_CODE = 3;
+
+    public final int REQUEST_IMAGE_CAPTURE = 4;
+    public final int REQUEST_IMAGE_GALLERY = 5;
+
+    // these ints are used when save button is clicked
+    // we will check image state and upload or delete photo to/from firebase depending on "imageState"
+    public final int NEW_FROM_CAMERA = 6;
+    public final int NEW_FROM_GALLERY = 7;
+    public final int CLEAR_PHOTO = 8;
+    public final int NO_CHANGE = 9;
+    public int imageState = NO_CHANGE;
+    public Bitmap newPhoto = null;
+    public Bitmap oldPhoto = null;
+    // need variables here to store bitmap (from camera) or uri (from gallery)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +92,7 @@ public class EditProfile extends AppCompatActivity {
         fbDatabase = FirebaseDatabase.getInstance();
         fbAuth = FirebaseAuth.getInstance();
         fbUser = fbAuth.getCurrentUser();
+        fbStorage = FirebaseStorage.getInstance();
 
         if (fbUser == null) {
             // no user logged in, send them to login screen
@@ -72,15 +107,56 @@ public class EditProfile extends AppCompatActivity {
         newPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // use dialog to let user pick between camera or gallery
+                // save corresponding variable in onActionResult function
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(EditProfile.this, android.R.style.Theme_Material_Dialog_Alert);
+                }
+                else {
+                    builder = new AlertDialog.Builder(EditProfile.this);
+                }
+                builder.setTitle("Upload a Profile Picture");
+                builder.setMessage("Where would you like to upload the image from?");
+                // neutral, negative, and positive buttons are mixed up just to give proper button order
+                builder.setNeutralButton("Camera", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // open camera activity
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                        }
+                    }
+                });
+                builder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // open gallery activity
+                        Intent getPictureIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        getPictureIntent.setType("image/*");
+                        if (getPictureIntent.resolveActivity(getPackageManager()) != null) {
 
+                            startActivityForResult(getPictureIntent, REQUEST_IMAGE_GALLERY);
+                        }
+                    }
+                });
+                builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // do nothing, it will close on its own
+                    }
+                });
+                builder.setIcon(R.drawable.ic_menu_camera);
+                builder.show();
             }
         });
 
         clearPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // in future, we should store photo uri to another global variable in order to
-                // delete it from firebase storage
+                // let save handler know that we should delete user image
+                imageState = CLEAR_PHOTO;
                 profilePicture.setImageResource(R.color.lightGrey);
                 Toast.makeText(EditProfile.this, "Profile picture cleared", Toast.LENGTH_SHORT).show();
             }
@@ -99,12 +175,32 @@ public class EditProfile extends AppCompatActivity {
                 editState.setText(currentUser.getState());
 
                 // get user profile picture uri (as a string) from firebase
-                String photoString = currentUser.getPhoto();
-                if (!photoString.equals("")) {
-                    // if string exists (not empty) then load image into imageview
-                    Uri photoUrl = Uri.parse(photoString);
-                    Picasso.with(EditProfile.this).load(photoUrl).into(profilePicture);
+                if (currentUser.getPhoto() != null && !(currentUser.getPhoto().equals(""))) {
+                    StorageReference photoRef = fbStorage.getReferenceFromUrl(currentUser.getPhoto());
+                    final long TWO_MEGABYTES = 1024 * 2048;
+                    photoRef.getBytes(TWO_MEGABYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            oldPhoto = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            profilePicture.setImageBitmap(oldPhoto);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            notifyUser("Error loading profile picture from database.");
+                            // handle errors
+                        }
+                    });
                 }
+
+
+
+//                String photoString = currentUser.getPhoto();
+//                if (!photoString.equals("")) {
+//                    // if string exists (not empty) then load image into imageview
+//                    Uri photoUrl = Uri.parse(photoString);
+//                    Picasso.with(EditProfile.this).load(photoUrl).into(profilePicture);
+//                }
                 // if string empty, don't load anything
 
             }
@@ -115,6 +211,34 @@ public class EditProfile extends AppCompatActivity {
             // do nothing
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
+            // handle image from camera
+            imageState = NEW_FROM_CAMERA;
+
+            // setImage to bitmap, although this only gets thumbnail image currently
+            newPhoto = (Bitmap)data.getExtras().get("data");
+            profilePicture.setImageBitmap(newPhoto);
+        }
+        else if (requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK && data != null) {
+            // handle image from gallery
+            imageState = NEW_FROM_GALLERY;
+
+            try {
+                Uri imageUri = data.getData();
+                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                newPhoto = BitmapFactory.decodeStream(imageStream);
+                profilePicture.setImageBitmap(newPhoto);
+
+            } catch(FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Something went wrong in creating input stream.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -143,10 +267,50 @@ public class EditProfile extends AppCompatActivity {
             currentUser.setCity(editCity.getText().toString());
             currentUser.setState(editState.getText().toString());
 
-            // TODO
-            // setphoto = imageview (if from gallery, its a uri, from camera its a bitmap)
-            // if imageview is empty: currentUser.setPhoto("");
-            // else: upload photo to firebase, then currentUser.setPhoto(<firebase storage uri>)
+            if (imageState != NO_CHANGE) {
+                // this means there was a change in imageState
+
+                if (imageState == CLEAR_PHOTO) {
+                    // delete photo from firebase
+                    StorageReference deleteFile = fbStorage.getReferenceFromUrl(currentUser.getPhoto());
+                    deleteFile.delete().addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            notifyUser("Failed to delete photo. Please try again.");
+                        }
+                    });
+
+                    // set user photo to empty string
+                    currentUser.setPhoto("");
+
+                }
+                else if (imageState == NEW_FROM_GALLERY || imageState == NEW_FROM_CAMERA) {
+                    // upload photo to firebase, set new photo url
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    newPhoto.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                    byte[] imageData = baos.toByteArray();
+
+                    StorageReference imageRef = fbStorage.getReference().child("profileimages/"+fbUser.getUid()+".png");
+
+                    UploadTask uploadTask = imageRef.putBytes(imageData);
+                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            notifyUser("Image upload failed. Please try again.");
+                            currentUser.setPhoto("");
+                            Log.e("EditProfile", "Image upload failed. Exception: " + e.getMessage());
+                        }
+                    });
+                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            String photoUrl = taskSnapshot.getDownloadUrl().toString();
+                            fbDatabase.getReference("users").child(fbUser.getUid()).child("photo").setValue(photoUrl);
+                        }
+                    });
+                }
+            }
+
 
             fbDatabase.getReference("users").child(fbUser.getUid()).setValue(currentUser);
 
@@ -159,6 +323,12 @@ public class EditProfile extends AppCompatActivity {
             editPhone.setText(currentUser.getPhoneNumber());
             editCity.setText(currentUser.getCity());
             editState.setText(currentUser.getState());
+
+            // reload image from firebase storage
+            // should store image as bitmap or similar in memory to avoid another download
+            imageState = NO_CHANGE;
+            notifyUser("All changes reverted.");
+            profilePicture.setImageBitmap(oldPhoto);
         }
         else if (id == EXIT_CODE) {
             notifyUser("Changes not saved.");

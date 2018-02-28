@@ -98,7 +98,7 @@ public class ItemFormPage1 extends AppCompatActivity {
                 bundle.putString("IMAGE_URI", data.getData().toString());
             } catch(FileNotFoundException e) {
                 e.printStackTrace();
-                Toast.makeText(this, "Something went wrong.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Something went wrong in creating input stream.", Toast.LENGTH_SHORT).show();
             }
         }
     }

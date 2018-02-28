@@ -131,6 +131,8 @@ public class UserProfile extends AppCompatActivity {
                 database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
             }
 
+            database.getReference("users").child(user.getUid()).child("photo").addValueEventListener(profilePictureListener);
+
         }
         else {
             // user not logged in
@@ -242,6 +244,31 @@ public class UserProfile extends AppCompatActivity {
                 }
                 // if string empty, don't load anything
 
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            // do nothing
+        }
+    };
+
+    // listen for changes to "photo" field for current user in database, get profile picture
+    ValueEventListener profilePictureListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // get user profile picture uri (as a string) from firebase
+            String photoString = dataSnapshot.getValue(String.class);
+            if (photoString != null && !photoString.equals("")) {
+                // if string exists (not empty) then load image into imageview
+                Uri photoUrl = Uri.parse(photoString);
+                ImageView profilePicture = findViewById(R.id.userpic);
+                Picasso.with(UserProfile.this).load(photoUrl).into(profilePicture);
+            }
+            else if (photoString.equals("")) {
+                // clear photo back to placeholder
+                ImageView profilePicture = findViewById(R.id.userpic);
+                profilePicture.setImageResource(R.color.lightGrey);
             }
         }
 
