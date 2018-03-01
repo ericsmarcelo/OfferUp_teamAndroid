@@ -46,7 +46,7 @@
                     android:id="@+id/userNameText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Shweti Mahajan"
+                    android:text=""
                     android:textSize="25sp"
                     android:layout_marginTop="3dp"/>
             </LinearLayout>
@@ -64,7 +64,7 @@
                     android:textSize="13sp"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:text="shweticute@yahoo.com"
+                    android:text=""
 
                     />
             </LinearLayout>
@@ -81,7 +81,7 @@
                     android:textSize="13sp"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:text="(951) 231 7053"
+                    android:text=""
 
                     />
             </LinearLayout>
@@ -98,7 +98,7 @@
                     android:textSize="13sp"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:text="Los Angeles, California"
+                    android:text=""
 
                     />
             </LinearLayout>

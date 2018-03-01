@@ -56,6 +56,8 @@ public class UserProfile extends AppCompatActivity {
     private boolean flag;
     private Menu menu;
 
+    public final int EDIT_PROFILE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,31 +119,23 @@ public class UserProfile extends AppCompatActivity {
 
         // we should receive userid from intent here in case we are viewing a profile that isn't our own
         // then we can get that user's information instead of our logged in accounts information
-        if(user != null)
-        {
-
-            if (profileUid != null) {
-                database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
-            }
-            else {
-                // BAD!
-                // USERID SHOULD BE PASSED VIA INTENT TO THIS ACTIVITY
-                // THIS CURRENTLY GETS LOGGED IN USER INFO IF NO USERID IS PASSED IN,
-                // WHICH SHOULD NOT HAPPEN IF WE WANT TO VIEW A DIFFERENT USER PROFILE
-                database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
-            }
-
-            database.getReference("users").child(user.getUid()).child("photo").addValueEventListener(profilePictureListener);
-
+        if (profileUid != null) {
+            database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
+            database.getReference("users").child(profileUid).child("photo").addValueEventListener(profilePictureListener);
         }
         else {
-            // user not logged in
-            userName.setText(" ");
-            userEmail.setText(" ");
-            userPhone.setText(" ");
-            userCityState.setText(" ");
-            ratingBar.setRating(3.5f);
+            // bad
+            // userid should be passed via intent to this activity
+            // this code
+            // WHICH SHOULD NOT HAPPEN IF WE WANT TO VIEW A DIFFERENT USER PROFILE
+            if (user != null) {
+                database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+                database.getReference("users").child(user.getUid()).child("photo").addValueEventListener(profilePictureListener);
+            }
         }
+
+
+
 
     }
 
@@ -154,8 +148,7 @@ public class UserProfile extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == 1) {
-            // 1 is the id for EditProfile
+        if (id == EDIT_PROFILE) {
             Intent intent = new Intent(UserProfile.this, EditProfile.class);
             startActivity(intent);
         }

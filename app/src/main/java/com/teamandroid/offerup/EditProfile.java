@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -192,17 +193,6 @@ public class EditProfile extends AppCompatActivity {
                         }
                     });
                 }
-
-
-
-//                String photoString = currentUser.getPhoto();
-//                if (!photoString.equals("")) {
-//                    // if string exists (not empty) then load image into imageview
-//                    Uri photoUrl = Uri.parse(photoString);
-//                    Picasso.with(EditProfile.this).load(photoUrl).into(profilePicture);
-//                }
-                // if string empty, don't load anything
-
             }
         }
 
@@ -219,6 +209,7 @@ public class EditProfile extends AppCompatActivity {
             // handle image from camera
             imageState = NEW_FROM_CAMERA;
 
+            // TODO: Get Full Sized Image From Camera
             // setImage to bitmap, although this only gets thumbnail image currently
             newPhoto = (Bitmap)data.getExtras().get("data");
             profilePicture.setImageBitmap(newPhoto);
@@ -231,6 +222,12 @@ public class EditProfile extends AppCompatActivity {
                 Uri imageUri = data.getData();
                 InputStream imageStream = getContentResolver().openInputStream(imageUri);
                 newPhoto = BitmapFactory.decodeStream(imageStream);
+
+                // TODO: Rotate image
+                // image seems to be rotated incorrectly when loaded
+                // so we should rotate it back here
+                // use support library to get exif data and rotate based on its current orientation
+
                 profilePicture.setImageBitmap(newPhoto);
 
             } catch(FileNotFoundException e) {
@@ -286,6 +283,16 @@ public class EditProfile extends AppCompatActivity {
                 }
                 else if (imageState == NEW_FROM_GALLERY || imageState == NEW_FROM_CAMERA) {
                     // upload photo to firebase, set new photo url
+
+                    // resize image if its too large, as the displayed images in app are small
+                    int photoWidth = newPhoto.getWidth();
+                    int photoHeight = newPhoto.getHeight();
+                    while (photoWidth > 1000 || photoHeight > 1000) {
+                        photoWidth = photoWidth / 2;
+                        photoHeight = photoHeight / 2;
+                        newPhoto = Bitmap.createScaledBitmap(newPhoto, photoWidth, photoHeight, true);
+                    }
+
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     newPhoto.compress(Bitmap.CompressFormat.PNG, 100, baos);
                     byte[] imageData = baos.toByteArray();

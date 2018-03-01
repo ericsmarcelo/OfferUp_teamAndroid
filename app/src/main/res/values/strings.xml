@@ -41,6 +41,7 @@
     <string name="title_activity_google_in">Google Login </string>
 
     <string name="image_name">Image Here</string>
+    <string name="post_form_1_description">Post an item: Let\'s start by adding the name and a photo of your product.</string>
     <string name="item_name">Enter Item Name Here</string>
     <string name="take_photo">Take Photo</string>
     <string name="gallery">Gallery</string>
@@ -57,7 +58,7 @@
     <string name="step2">Step 2 of 4</string>
     <string name="step3">Step 3 of 4</string>
     <string name="step4">Step 4 of 4</string>
-    <string name="photo">Add photos of item</string>
+    <string name="photo">Add photo of item</string>
     <string name="category">Select Category</string>
     <string name="title_activity_home_page">Home</string>
 

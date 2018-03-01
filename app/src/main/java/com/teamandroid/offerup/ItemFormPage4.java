@@ -105,7 +105,7 @@ public class ItemFormPage4 extends AppCompatActivity {
                 int imageWidth = postImage.getWidth();
                 int imageHeight = postImage.getHeight();
                 if (imageWidth > 2000 || imageHeight > 2000) {
-                    Toast.makeText(ItemFormPage4.this, "Resizing large image...", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(ItemFormPage4.this, "Resizing large image...", Toast.LENGTH_SHORT).show();
                     imageWidth = (int)(imageWidth*0.25);
                     imageHeight = (int)(imageHeight*0.25);
                     postImage = Bitmap.createScaledBitmap(postImage, imageWidth, imageHeight, true);
