@@ -34,8 +34,6 @@ public class ItemFormPage2 extends AppCompatActivity {
         }
         itemDesc = (EditText) findViewById(R.id.itemDesc);
 
-        //fbAuth = FirebaseAuth.getInstance();
-        //FirebaseUser user = fbAuth.getCurrentUser();
     }
 
     @Override
@@ -44,13 +42,6 @@ public class ItemFormPage2 extends AppCompatActivity {
         if(b.getString("ITEM_NAME") != null) {
             itemDesc.setText(b.getString("ITEM_DESC"));
         }
-    }
-
-    public void toPageOne(View view) {
-        b.putString("ITEM_DESC", itemDesc.getText().toString());
-        Intent intent = new Intent(this, ItemFormPage1.class);
-        intent.putExtras(b);
-        startActivity(intent);
     }
 
     public void toPageThree(View view) {
@@ -64,10 +55,4 @@ public class ItemFormPage2 extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void toPageFour(View view) {
-        b.putString("ITEM_DESC", itemDesc.getText().toString());
-        Intent intent = new Intent(this, ItemFormPage4.class);
-        intent.putExtras(b);
-        startActivity(intent);
-    }
 }

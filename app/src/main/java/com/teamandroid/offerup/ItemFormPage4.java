@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -76,10 +77,14 @@ public class ItemFormPage4 extends AppCompatActivity {
         TextView tempItemName = findViewById(R.id.tempItemName);
         TextView tempPrice = findViewById(R.id.tempPrice);
         TextView tempCategory = findViewById(R.id.tempCategory);
+        TextView tempDescription = findViewById(R.id.tempDescription);
 
         tempItemName.setText(b.getString("ITEM_NAME"));
         tempPrice.setText(String.format(Locale.getDefault(),"%f", b.getFloat("ITEM_PRICE")));
         tempCategory.setText(b.getString("CATEGORY"));
+        tempDescription.setText(b.getString("ITEM_DESC"));
+
+        tempDescription.setMovementMethod(new ScrollingMovementMethod());
     }
 
     // finish posting the item
