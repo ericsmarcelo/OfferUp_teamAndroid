@@ -15,6 +15,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
+// NOT IN USE ANYMORE
+
+/*
 public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.ItemListener {
 
     public FirebaseAuth fbAuth;
@@ -167,3 +170,4 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
         fbUser = fbAuth.getCurrentUser();
     }
 }
+*/

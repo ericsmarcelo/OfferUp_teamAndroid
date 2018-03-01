@@ -214,7 +214,7 @@ public class GoogleInActivity extends AppCompatActivity implements GoogleApiClie
 
             }
         });
-        Intent intent = new Intent(this, Welcome.class);
+        Intent intent = new Intent(this, HomePage.class);
         startActivity(intent);
 
     }

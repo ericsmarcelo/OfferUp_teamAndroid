@@ -66,7 +66,7 @@ public class ItemFormPage4 extends AppCompatActivity {
         if (fbUser == null) {
             // no logged in user, go back to home activity
             Toast.makeText(this, "Error, user not logged in.", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, Welcome.class);
+            Intent intent = new Intent(this, HomePage.class);
             startActivity(intent);
         }
 
