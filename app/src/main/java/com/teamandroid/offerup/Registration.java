@@ -22,9 +22,7 @@ public class Registration extends AppCompatActivity {
 
     private EditText emailText;
     private EditText passwordText;
-    private TextView userText;
     private TextView nameText;
-    private TextView statusText;
     private Button registerButton;
     private FirebaseAuth fbAuth;
     private FirebaseAuth.AuthStateListener authListener;
@@ -39,12 +37,9 @@ public class Registration extends AppCompatActivity {
 
         registerButton = findViewById(R.id.registration);
         nameText = findViewById((R.id.registrationNameText));
-        userText = findViewById(R.id.userText);
-        statusText = findViewById(R.id.statusText);
         emailText = findViewById(R.id.emailText);
         passwordText = findViewById(R.id.passwordText);
-        userText.setText("");
-        statusText.setText("");
+
 
         database = FirebaseDatabase.getInstance();
         fbAuth = FirebaseAuth.getInstance();
@@ -55,10 +50,6 @@ public class Registration extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                if(user != null) {
-                    userText.setText(user.getEmail());
-                    statusText.setText("Registered");
-                }
             }
         };
 
@@ -69,18 +60,6 @@ public class Registration extends AppCompatActivity {
                 createAccount(view);
             }
         });
-
-
-
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
     }
 
     @Override
@@ -142,8 +121,9 @@ public class Registration extends AppCompatActivity {
                             database.getReference("users").child(uid).setValue(dbUser);
 
                             // go to profile activity (should change to home page later)
-                            Intent intent = new Intent(Registration.this, UserProfile.class);
-                            startActivity(intent);
+//                            Intent intent = new Intent(Registration.this, UserProfile.class);
+//                            startActivity(intent);
+                            finish();
                         }
                     }
                 });

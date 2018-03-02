@@ -5,15 +5,22 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -37,13 +44,19 @@ import com.squareup.picasso.Picasso;
 
 public class UserProfile extends AppCompatActivity {
 
+    private String profileUid;
     private TextView userName;
     private TextView userEmail;
     private TextView userPhone;
+    private TextView userCityState;
     private FirebaseAuth fbAuth;
     private FirebaseDatabase database;
     static private User dbUser;
     static RatingBar ratingBar;
+    private boolean flag;
+    private Menu menu;
+
+    public final int EDIT_PROFILE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,17 +64,25 @@ public class UserProfile extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // profileUid is the ID of the profile we are viewing, doesn't have to be the same as
+        // the current logged in user
+        profileUid = getIntent().getStringExtra("profileUid");
+
         //User Profile display
         userName = (TextView) findViewById(R.id.userNameText);
         userEmail = (TextView) findViewById(R.id.userEmailText);
         userPhone = (TextView) findViewById(R.id.userPhoneText);
+        userCityState = findViewById(R.id.userLocationText);
 
         LinearLayout rating = (LinearLayout) findViewById(R.id.rating);
         //RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
         ratingBar = (RatingBar) findViewById(R.id.ratingsbar);
+        flag= true;
         rating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(flag)
                 new RatingBarDialog().show(getFragmentManager(),"rating");
             }
         });
@@ -92,45 +113,46 @@ public class UserProfile extends AppCompatActivity {
 
         Picasso.with(getApplicationContext())
                 .load("http://via.placeholder.com/350x350")
-                .transform(new RoundedTransformation(100,10))
+                .transform(new RoundedTransformation(50,10))
                 .fit()
                 .centerCrop().into(userImg);
 
-        if(user != null)
-        {
-            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
-
-            // add EditProfile button if user is logged in
-            // *** we SHOULD check if logged in user matches profile ID ***
-            ImageButton editProfileButton = new ImageButton(this);
-            editProfileButton.setImageResource(R.drawable.ic_edit);
-
-            // create parameter variable to store the positioning of the button
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
-            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-            // add the Button to the layout
-            RelativeLayout profileLayout = findViewById(R.id.content_user_profile);
-            profileLayout.addView(editProfileButton, params);
-
-            // add click listener to editProfile button to send user to EditProfile activity
-            editProfileButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(UserProfile.this, EditProfile.class);
-                    startActivity(intent);
-                }
-            });
+        // we should receive userid from intent here in case we are viewing a profile that isn't our own
+        // then we can get that user's information instead of our logged in accounts information
+        if (profileUid != null) {
+            database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
+            database.getReference("users").child(profileUid).child("photo").addValueEventListener(profilePictureListener);
         }
         else {
-            // user not logged in
-            userName.setText("Shweti Mahajan");
-            userEmail.setText("shwetimahajan1993@gmail.com");
-            userPhone.setText("(984) 528-1129");
-            ratingBar.setRating(3.5f);
+            // bad
+            // userid should be passed via intent to this activity
+            // this code
+            // WHICH SHOULD NOT HAPPEN IF WE WANT TO VIEW A DIFFERENT USER PROFILE
+            if (user != null) {
+                database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+                database.getReference("users").child(user.getUid()).child("photo").addValueEventListener(profilePictureListener);
+            }
         }
 
+
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == EDIT_PROFILE) {
+            Intent intent = new Intent(UserProfile.this, EditProfile.class);
+            startActivity(intent);
+        }
+        return true;
     }
 
     static public void addRatingToUser(float newRating) {
@@ -157,7 +179,8 @@ public class UserProfile extends AppCompatActivity {
         super.onRestart();
         FirebaseUser user = fbAuth.getCurrentUser();
         if (user != null) {
-            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+//            database.getReference("users").child(user.getUid()).addListenerForSingleValueEvent(userListener);
+            database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
         }
 
     }
@@ -172,24 +195,73 @@ public class UserProfile extends AppCompatActivity {
                 userName.setText(dbUser.getName());
                 userEmail.setText(dbUser.getEmail());
                 String userPhoneNumber = dbUser.getPhoneNumber();
-//                String userCity = dbUser.getCity();
-//                String userState = dbUser.getState();
+                String userCity = dbUser.getCity();
+                String userState = dbUser.getState();
                 ratingBar.setRating((float)dbUser.getRating());
 
                 // set all text views to the value from user, granted that the value is not empty
-                if (userPhoneNumber != "") {
+                if (userPhoneNumber != null && !(userPhoneNumber.equals(""))) {
                     userPhone.setText(userPhoneNumber);
                 }
                 else {
-                    userPhone.setText("(000) 000-0000");
+                    userPhone.setText("No Phone Listed");
                 }
-//                if (userCity != "" || userCity != null) {
-//                    profileCity.setText(userCity);
-//                }
-//                if(userState != "" || userState != null) {
-//                    profileState.setText(userState);
-//                }
-//                profileRating.setText(String.valueOf(userRating));
+                if (userCity != null && !(userCity.equals("")) && userState != null && !(userState.equals(""))) {
+                    String cityAndState = userCity + ", " + userState;
+                    userCityState.setText(cityAndState);
+                }
+                else {
+                    userCityState.setText("No Location Listed");
+                }
+
+                // add edit profile to action bar if profile email matches logged in user
+                // only check if the menu item has not yet been added to action bar
+                if (menu.findItem(1) == null) {
+                    FirebaseUser firebaseUser = fbAuth.getCurrentUser();
+                    if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
+                        // if profile email matches current logged in user email, then show edit profile button
+                        flag =false;
+                        MenuItem editProfile = menu.add(1, 1, 101, "Edit Profile");
+                        editProfile.setIcon(R.drawable.edit);
+                        editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                    }
+                }
+
+                // get user profile picture uri (as a string) from firebase
+                String photoString = dbUser.getPhoto();
+                if (!photoString.equals("")) {
+                    // if string exists (not empty) then load image into imageview
+                    Uri photoUrl = Uri.parse(photoString);
+                    ImageView profilePicture = findViewById(R.id.userpic);
+                    Picasso.with(UserProfile.this).load(photoUrl).into(profilePicture);
+                }
+                // if string empty, don't load anything
+
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            // do nothing
+        }
+    };
+
+    // listen for changes to "photo" field for current user in database, get profile picture
+    ValueEventListener profilePictureListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // get user profile picture uri (as a string) from firebase
+            String photoString = dataSnapshot.getValue(String.class);
+            if (photoString != null && !photoString.equals("")) {
+                // if string exists (not empty) then load image into imageview
+                Uri photoUrl = Uri.parse(photoString);
+                ImageView profilePicture = findViewById(R.id.userpic);
+                Picasso.with(UserProfile.this).load(photoUrl).into(profilePicture);
+            }
+            else if (photoString.equals("")) {
+                // clear photo back to placeholder
+                ImageView profilePicture = findViewById(R.id.userpic);
+                profilePicture.setImageResource(R.color.lightGrey);
             }
         }
 

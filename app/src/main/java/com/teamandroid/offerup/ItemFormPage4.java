@@ -3,10 +3,12 @@ package com.teamandroid.offerup;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -27,6 +29,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -63,7 +66,7 @@ public class ItemFormPage4 extends AppCompatActivity {
         if (fbUser == null) {
             // no logged in user, go back to home activity
             Toast.makeText(this, "Error, user not logged in.", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, Welcome.class);
+            Intent intent = new Intent(this, HomePage.class);
             startActivity(intent);
         }
 
@@ -74,10 +77,14 @@ public class ItemFormPage4 extends AppCompatActivity {
         TextView tempItemName = findViewById(R.id.tempItemName);
         TextView tempPrice = findViewById(R.id.tempPrice);
         TextView tempCategory = findViewById(R.id.tempCategory);
+        TextView tempDescription = findViewById(R.id.tempDescription);
 
         tempItemName.setText(b.getString("ITEM_NAME"));
         tempPrice.setText(String.format(Locale.getDefault(),"%f", b.getFloat("ITEM_PRICE")));
         tempCategory.setText(b.getString("CATEGORY"));
+        tempDescription.setText(b.getString("ITEM_DESC"));
+
+        tempDescription.setMovementMethod(new ScrollingMovementMethod());
     }
 
     // finish posting the item
@@ -90,7 +97,32 @@ public class ItemFormPage4 extends AppCompatActivity {
         StorageReference imagesRef = fbStorage.getReference().child("images/"+uniqueID+".png");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Bitmap postImage = (Bitmap)b.getBundle("IMAGE").get("data");
+        Bitmap postImage = null;
+
+        if (b.getBundle("IMAGE") != null) {
+            postImage = (Bitmap)b.getBundle("IMAGE").get("data");
+        }
+        else if (b.getString("IMAGE_URI") != null) {
+            Uri imageUri = Uri.parse(b.getString("IMAGE_URI"));
+            try {
+                postImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                // crudely resize postImage bitmap if its too big (it probably will be)
+                int imageWidth = postImage.getWidth();
+                int imageHeight = postImage.getHeight();
+                if (imageWidth > 2000 || imageHeight > 2000) {
+                    // Toast.makeText(ItemFormPage4.this, "Resizing large image...", Toast.LENGTH_SHORT).show();
+                    imageWidth = (int)(imageWidth*0.25);
+                    imageHeight = (int)(imageHeight*0.25);
+                    postImage = Bitmap.createScaledBitmap(postImage, imageWidth, imageHeight, true);
+                }
+            } catch(IOException e) {
+                e.printStackTrace();
+                Toast.makeText(ItemFormPage4.this, "Converting image uri to bitmap went wrong.", Toast.LENGTH_LONG).show();
+            }
+
+
+
+        }
         postImage.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] imageData = baos.toByteArray();
         UploadTask uploadTask = imagesRef.putBytes(imageData);
@@ -136,9 +168,9 @@ public class ItemFormPage4 extends AppCompatActivity {
 
                 Toast.makeText(ItemFormPage4.this, "Finished Post Upload", Toast.LENGTH_SHORT).show();
 
-                // go back to welcome page
+                // go back to home page
                 // in future, make it go back to view the posting
-                Intent intent = new Intent(ItemFormPage4.this, Welcome.class);
+                Intent intent = new Intent(ItemFormPage4.this, HomePage.class);
                 startActivity(intent);
             }
         });

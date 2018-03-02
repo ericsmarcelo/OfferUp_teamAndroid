@@ -1,91 +1,59 @@
 package com.teamandroid.offerup;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.bumptech.glide.Glide;
 
-/**
- * Created by User on 2/21/2018.
- */
+import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-    ArrayList<DataModel> mValues;
-    Context mContext;
-    protected ItemListener mListener;
+    private Context context;
+    private List<Upload> uploads;
 
-    public RecyclerViewAdapter(Context context, ArrayList<DataModel> values, ItemListener itemListener) {
-
-        mValues = values;
-        mContext = context;
-        mListener=itemListener;
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public TextView textView;
-        public ImageView imageView;
-        public RelativeLayout relativeLayout;
-        DataModel item;
-
-        public ViewHolder(View v) {
-
-            super(v);
-
-            v.setOnClickListener(this);
-            textView = (TextView) v.findViewById(R.id.textView);
-            imageView = (ImageView) v.findViewById(R.id.imageView);
-            relativeLayout = (RelativeLayout) v.findViewById(R.id.relativeLayout);
-
-        }
-
-        public void setData(DataModel item) {
-            this.item = item;
-
-            textView.setText(item.text);
-            imageView.setImageResource(item.drawable);
-            relativeLayout.setBackgroundColor(Color.parseColor(item.color));
-
-        }
-
-
-        @Override
-        public void onClick(View view) {
-            if (mListener != null) {
-                mListener.onItemClick(item);
-            }
-        }
+    public RecyclerViewAdapter(Context context, List<Upload> uploads) {
+        this.uploads = uploads;
+        this.context = context;
     }
 
     @Override
-    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        View view = LayoutInflater.from(mContext).inflate(R.layout.recycler_view_item, parent, false);
-
-        return new ViewHolder(view);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.recycler_view_item, parent, false);
+        ViewHolder viewHolder = new ViewHolder(v);
+        return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder Vholder, int position) {
-        Vholder.setData(mValues.get(position));
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        Upload upload = uploads.get(position);
 
+        holder.textViewName.setText(upload.getName());
+
+        Glide.with(context).load(upload.getUrl()).into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-
-        return mValues.size();
+        return uploads.size();
     }
 
-    public interface ItemListener {
-        void onItemClick(DataModel item);
+    class ViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView textViewName;
+        public ImageView imageView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            textViewName = (TextView) itemView.findViewById(R.id.textViewName);
+            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+        }
     }
 }

@@ -9,17 +9,33 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 
+// NOT IN USE ANYMORE
+
+/*
 public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.ItemListener {
+
+    public FirebaseAuth fbAuth;
+    public FirebaseUser fbUser;
+    private Menu menu;
 
     RecyclerView recyclerView;
     ArrayList<DataModel> arrayList;
+
+    static final int AUTH_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        fbAuth = FirebaseAuth.getInstance();
+        fbUser = fbAuth.getCurrentUser();
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         arrayList = new ArrayList<>();
@@ -41,9 +57,52 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == AUTH_REQUEST && resultCode == RESULT_OK) {
+            if(data.getBooleanExtra("loginStatus", true)) {
+                fbUser = fbAuth.getCurrentUser();
+                menu.findItem(R.id.action_profile).setVisible(true);
+            }
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // set global menu variable pointing to current menu
+        this.menu = menu;
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_welcome, menu);
+        if (fbUser != null) {
+            // if user is logged in, hide the "log in" option in menu
+            menu.findItem(R.id.action_authentication).setVisible(false);
+            menu.findItem(R.id.action_registration).setVisible(false);
+        }
+        else {
+            // if user is not logged in, hide the "log out" and "profile" options in menu
+            menu.findItem(R.id.action_logout).setVisible(false);
+            menu.findItem(R.id.action_profile).setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // function called every time someone opens the menu
+        if (fbUser != null) {
+            // if user is logged in, hide the "log in" option in menu
+            menu.findItem(R.id.action_authentication).setVisible(false);
+            menu.findItem(R.id.action_registration).setVisible(false);
+            menu.findItem(R.id.action_logout).setVisible(true);
+            menu.findItem(R.id.action_profile).setVisible(true);
+        }
+        else {
+            // if user is not logged in, hide the "log out" and "profile" options in menu
+            menu.findItem(R.id.action_logout).setVisible(false);
+            menu.findItem(R.id.action_profile).setVisible(false);
+            menu.findItem(R.id.action_authentication).setVisible(true);
+            menu.findItem(R.id.action_registration).setVisible(true);
+        }
         return true;
     }
 
@@ -57,39 +116,58 @@ public class Welcome extends AppCompatActivity implements RecyclerViewAdapter.It
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        }else if (id == R.id.action_authentication) {
+        }
+        else if (id == R.id.action_authentication) {
             Intent intent = new Intent(this, Authentication.class);
-            startActivity(intent);
+            startActivityForResult(intent, AUTH_REQUEST);
             return true;
-        }else if (id == R.id.action_registration) {
+        }
+        else if (id == R.id.action_registration) {
             Intent intent = new Intent (this, Registration.class);
             startActivity(intent);
             return true;
-        }else if (id ==R.id.action_postform) {
-            Intent intent = new Intent(this, ItemFormPage1.class);
-            startActivity(intent);
-            return true;
-        }else if (id == R.id.action_googleIn) {
-            Intent intent = new Intent (this, GoogleInActivity.class);
-            startActivity(intent);
-            return true;
         }
+
         else if (id == R.id.action_profile) {
             Intent intent = new Intent(this, UserProfile.class);
+            intent.putExtra("profileUid", fbUser.getUid());
             startActivity(intent);
+            return true;
         }
-        else if (id == R.id.action_postform) {
-            Intent intent = new Intent(this, ItemFormPage1.class);
-            startActivity(intent);
+        else if (id == R.id.action_logout) {
+            // sign out, give notice to user
+            fbAuth.signOut();
+            fbUser = null;
+            Toast.makeText(this, "Signed Out", Toast.LENGTH_SHORT).show();
+
+            // After logged out, change menu to show log in button and hide log out button
+            menu.findItem(R.id.action_logout).setVisible(false);
+            menu.findItem(R.id.action_profile).setVisible(false);
+            menu.findItem(R.id.action_authentication).setVisible(true);
+            menu.findItem(R.id.action_registration).setVisible(true);
+
+            return true;
         }
+//        else if (id == R.id.action_googleIn) {
+//            Intent intent = new Intent (this, GoogleInActivity.class);
+//            startActivity(intent);
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
 
     //@Override
     public void onItemClick(DataModel item) {
-
+        // launch activity to view specific item
         Toast.makeText(getApplicationContext(), item.text + " is clicked", Toast.LENGTH_SHORT).show();
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fbUser = fbAuth.getCurrentUser();
+    }
 }
+*/

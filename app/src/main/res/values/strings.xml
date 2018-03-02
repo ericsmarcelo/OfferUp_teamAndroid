@@ -2,6 +2,9 @@
     <string name="app_name">OfferUp</string>
     <string name="action_settings">Settings</string>
     <string name="login_logout">Login / Logout</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="login_title">Log In To OfferUp</string>
     <string name="title_activity_authentication">Login / Logout</string>
     <string name="sign_out">Sign Out</string>
     <string name="sign_in">Sign In</string>
@@ -9,11 +12,15 @@
     <string name="password_required">Password (Required)</string>
     <string name="email">Email</string>
     <string name="reset_password">Reset Password</string>
+    <string name="forgot_password_hint">Forgot your password? Type your email and tap the \"Reset Password\" button below.</string>
     <string name="create_account">Create Account</string>
+    <string name="profile_picture_description">User Profile Picture</string>
+    <string name="edit_profile">Edit Profile</string>
     <string name="offerup">OfferUp</string>
     <string name="title_activity_registration">Registration</string>
     <string name="name">(Name)</string>
-    <string name="register">Register</string>
+    <string name="register">Create Account</string>
+    <string name="registration_title">Create an Account</string>
     <string name="registration_name">Name...</string>
     <string name="registration_password">Password...</string>
     <string name="registration_email">Email...</string>
@@ -26,21 +33,25 @@
     <string name="google_sign_out">Google Sign Out</string>
     <string name="google_sign_in">Google Sign-in</string>
     <string name="google_in">Google In</string>
-    <string name="registration">Registration</string>
+    <string name="registration">Create An Account</string>
     <string name="google_logout">Google Logout</string>
     <string name="google_login">Google Login</string>
+    <string name="menu_postform">Post An Item</string>
     <string name="todo">TODO</string>
     <string name="title_activity_google_in">Google Login </string>
 
     <string name="image_name">Image Here</string>
-    <string name="item_name">Enter Item Name Here</string>
+    <string name="post_form_1_description">Let\'s start! \nPlease add a name and photo for your item.</string>
+    <string name="post_form_2_description">Now let\'s add a description of your item. \nPlease be as descriptive as possible!</string>
+    <string name="post_form_name">Item Name:</string>
+    <string name="item_name">Enter Item Name</string>
     <string name="take_photo">Take Photo</string>
-    <string name="upload">Upload</string>
+    <string name="gallery">Gallery</string>
     <string name="label_1">1</string>
     <string name="label_2">2</string>
     <string name="label_3">3</string>
     <string name="label_4">4</string>
-  
+
     <string name="next">Next</string>
     <string name="description">Enter a description for your item</string>
     <string name="spin">Choose a category</string>
@@ -49,7 +60,8 @@
     <string name="step2">Step 2 of 4</string>
     <string name="step3">Step 3 of 4</string>
     <string name="step4">Step 4 of 4</string>
-    <string name="photo">Add photos of item</string>
+    <string name="photo">Add photo of item:</string>
     <string name="category">Select Category</string>
+    <string name="title_activity_home_page">Home</string>
 
 </resources>

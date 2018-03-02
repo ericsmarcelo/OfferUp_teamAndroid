@@ -12,22 +12,27 @@
     tools:showIn="@layout/activity_edit_profile">
 
     <TextView
+        android:id="@+id/editProfileText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editProfileText"
-        android:text="Edit Profile"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="72dp"
         android:gravity="center"
+        android:text="@string/edit_profile"
         android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textSize="24sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/editProfileText"
-        android:layout_marginTop="32dp"
-        android:padding="16dp"
-        android:orientation="vertical">
+        android:layout_marginTop="24dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -128,25 +133,50 @@
 
         </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/saveChangesButton"
-            android:text=" Save Changes"
-            android:drawableLeft="@drawable/ic_save"
-            android:layout_gravity="center"
-            android:layout_marginTop="32dp" />
+            android:layout_marginTop="36dp"
+            android:orientation="horizontal"
+            android:gravity="center">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/restoreValuesButton"
-            android:text=" Reload Values"
-            android:drawableLeft="@drawable/ic_refresh"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp" />
+            <ImageView
+                android:id="@+id/viewProfilePicture"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/profile_picture_description"
+                android:scaleType="fitStart"
+                app:srcCompat="@color/lightGrey" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginLeft="24dp">
+
+                <Button
+                    android:id="@+id/newPhotoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set New Photo"/>
+
+                <Button
+                    android:id="@+id/clearPhotoButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Clear Photo"/>
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
 
 
     </LinearLayout>
+
+
 
 </RelativeLayout>

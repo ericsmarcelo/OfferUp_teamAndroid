@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/offerup"
+        android:text="Offer Up"
         android:textColor="@color/colorPrimary"
         android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Display3"

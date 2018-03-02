@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/OfferUp_teamAndroid.iml" filepath="$PROJECT_DIR$/OfferUp_teamAndroid.iml" />
+      <module fileurl="file://C:\Users\Glenn\Desktop\OfferUp_teamAndroid\OfferUp_teamAndroid.iml" filepath="C:\Users\Glenn\Desktop\OfferUp_teamAndroid\OfferUp_teamAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\Glenn\Desktop\OfferUp_teamAndroid\app\app.iml" filepath="C:\Users\Glenn\Desktop\OfferUp_teamAndroid\app\app.iml" />
     </modules>
   </component>
 </project>

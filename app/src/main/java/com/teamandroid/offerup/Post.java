@@ -1,6 +1,8 @@
 package com.teamandroid.offerup;
 
 
+import android.provider.ContactsContract;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,15 +11,18 @@ public class Post {
     private String description;
     private String itemName;
     private List<String> category;
+    private List<String> messageThreads;
     private String condition;
     private double price;
+    private List<Offer> offers;
     private String image;
     private String owner;
 
     //default constructor
     public Post() { }
 
-    public Post(String description, String itemName, List<String> category, String condition, double price, String image) {
+    public Post(String description, String itemName, List<String> category, String condition, double price,
+                String image, String owner, List<String> messageThreads, List<Offer> offers) {
         this.description = description;
         this.itemName = itemName;
         this.category = category;
@@ -39,12 +44,20 @@ public class Post {
         return category;
     }
 
+    public List<String> getMessageThreads() {
+        return messageThreads;
+    }
+
     public String getCondition() {
         return condition;
     }
 
     public double getPrice() {
         return price;
+    }
+
+    public List<Offer> getOffers() {
+        return offers;
     }
 
     public String getImage() {
@@ -68,6 +81,9 @@ public class Post {
         category = newCategory;
     }
 
+    public void setMessageThreads(List<String> messageThreads) {
+        this.messageThreads = messageThreads;
+    }
 
     public void setCondition(String newCondition) {
         condition = newCondition;
@@ -75,6 +91,14 @@ public class Post {
 
     public void setPrice(double newPrice) {
         price = newPrice;
+    }
+
+    public void setOffers(List<Offer> offers) {
+        this.offers = offers;
+    }
+
+    public void addOffer(Offer newOffer) {
+        offers.add(newOffer);
     }
 
     public void setImage(String newImage) {
