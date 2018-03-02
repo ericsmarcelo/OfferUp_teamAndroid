@@ -5,6 +5,8 @@
         <item>Music</item>
         <item>Electronics</item>
         <item>Clothes</item>
+        <item>Educational</item>
+        <item>Other</item>
     </string-array>
 
     <string-array name="spinnerItems1">

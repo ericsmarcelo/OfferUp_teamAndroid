@@ -18,6 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.app.ProgressDialog;
 import android.support.v7.widget.LinearLayoutManager;
+import android.widget.EditText;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,6 +47,7 @@ public class HomePage extends AppCompatActivity
     public DatabaseReference mDatabase;
     public ProgressDialog progressDialog;
     public List<Upload> uploads;
+    public List<String> categories;
     public String DatabasePath = "posts";
 
     static final int AUTH_REQUEST = 1;
@@ -121,7 +125,32 @@ public class HomePage extends AppCompatActivity
             public void onCancelled(DatabaseError databaseError) {
                 progressDialog.dismiss();
             }
-    });
+        });
+
+        EditText editText = findViewById(R.id.edittext);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                ArrayList<Upload> filteredList = new ArrayList<>();
+                for(Upload item : uploads) {
+                    //itemName
+                    if(item.getName().toLowerCase().contains(s.toString().toLowerCase())) {
+                        filteredList.add(item);
+                    }
+                    //category
+                    else if(item.getCategory().get(0).toLowerCase().contains(s.toString().toLowerCase())) {
+                        filteredList.add(item);
+                    }
+                }
+                adapter = new RecyclerViewAdapter(getApplicationContext(), filteredList);
+                recyclerView.setAdapter(adapter);
+            }
+        });
+
         userName = (TextView)header.findViewById(R.id.username);
         userEmail = (TextView) header.findViewById(R.id.email);
 

@@ -11,11 +11,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private Context context;
-    private List<Upload> uploads;
+    public List<Upload> uploads;
 
     public RecyclerViewAdapter(Context context, List<Upload> uploads) {
         this.uploads = uploads;
@@ -35,13 +36,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Upload upload = uploads.get(position);
 
         holder.textViewName.setText(upload.getName());
-
         Glide.with(context).load(upload.getUrl()).into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
         return uploads.size();
+    }
+
+    public void filterList(ArrayList<Upload> filteredList) {
+        uploads = filteredList;
+        notifyDataSetChanged();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
