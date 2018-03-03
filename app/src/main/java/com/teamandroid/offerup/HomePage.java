@@ -1,10 +1,17 @@
 package com.teamandroid.offerup;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +21,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.ProgressDialog;
@@ -245,6 +257,11 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.logout).setVisible(false);
             navMenu.findItem(R.id.profile).setVisible(false);
         }
+
+        // set search icon to white
+        menu.findItem(R.id.action_search).getIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+
+
         return true;
     }
 
@@ -290,6 +307,12 @@ public class HomePage extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if (id == R.id.action_search) {
+            final EditText searchText = findViewById(R.id.edittext);
+            // if search field is gone, then make it visible. if it is already there then hide it
+            toggleSearch(searchText);
+
         }
         else if (id == R.id.action_authentication) {
             Intent intent = new Intent(this, Authentication.class);
@@ -404,5 +427,72 @@ public class HomePage extends AppCompatActivity
         }
     }
 
+    public void toggleSearch(final EditText searchText) {
+        if (searchText.getVisibility()== View.INVISIBLE) {
+            // make visible, then slide down
+
+            searchText.setVisibility(View.VISIBLE);
+
+            Animation a = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)searchText.getLayoutParams();
+                    params.topMargin = -165 + (int)(165 * interpolatedTime);
+                    searchText.setLayoutParams(params);
+                }
+            };
+            a.setDuration(300);
+            a.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    searchText.setFocusableInTouchMode(true);
+                    searchText.requestFocusFromTouch();
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (inputMethodManager != null) {
+                        inputMethodManager.toggleSoftInputFromWindow(searchText.getApplicationWindowToken(), InputMethodManager.SHOW_IMPLICIT, 0);
+                    }
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) { /* nothing */ }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) { /* nothing */ }
+            });
+            searchText.startAnimation(a);
+
+        }
+        else {
+            // slide up and then hide
+
+            Animation a = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)searchText.getLayoutParams();
+                    params.topMargin = (int)(-165 * interpolatedTime);
+                    searchText.setLayoutParams(params);
+                }
+            };
+            a.setDuration(300);
+            a.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (inputMethodManager != null) {
+                        inputMethodManager.hideSoftInputFromWindow(searchText.getApplicationWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    }
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    searchText.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) { /* nothing */ }
+            });
+            searchText.startAnimation(a);
+        }
+    }
 
 }

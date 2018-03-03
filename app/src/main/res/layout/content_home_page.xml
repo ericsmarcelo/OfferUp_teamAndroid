@@ -8,10 +8,10 @@
     tools:context="com.teamandroid.offerup.HomePage"
     tools:showIn="@layout/app_bar_home_page">
 
-    <EditText
-        android:id="@+id/edittext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Search By Title or Category" />
+    <!--<EditText-->
+        <!--android:id="@+id/edittext"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:hint="Search By Title or Category"/>-->
 
 </android.support.constraint.ConstraintLayout>
