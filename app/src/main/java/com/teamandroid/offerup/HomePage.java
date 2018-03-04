@@ -63,6 +63,8 @@ public class HomePage extends AppCompatActivity
     public String DatabasePath = "posts";
 
     static final int AUTH_REQUEST = 1;
+    static final int REGISTRATION_REQUEST = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -226,6 +228,12 @@ public class HomePage extends AppCompatActivity
                 menu.findItem(R.id.action_profile).setVisible(true);
             }
         }
+        else if (requestCode == REGISTRATION_REQUEST && resultCode == RESULT_OK) {
+            if(data.getBooleanExtra("registrationStatus", true)) {
+                fbUser = fbAuth.getCurrentUser();
+                menu.findItem(R.id.action_profile).setVisible(true);
+            }
+        }
     }
 
     @Override
@@ -321,7 +329,7 @@ public class HomePage extends AppCompatActivity
         }
         else if (id == R.id.action_registration) {
             Intent intent = new Intent (this, Registration.class);
-            startActivity(intent);
+            startActivityForResult(intent, REGISTRATION_REQUEST);
             return true;
         }
 
@@ -392,7 +400,7 @@ public class HomePage extends AppCompatActivity
         } else if (id == R.id.signup) {
 
             Intent intent = new Intent (this, Registration.class);
-            startActivity(intent);
+            startActivityForResult(intent, REGISTRATION_REQUEST);
 
         } else if (id == R.id.home) {
             Intent intent = new Intent (this, HomePage.class);
