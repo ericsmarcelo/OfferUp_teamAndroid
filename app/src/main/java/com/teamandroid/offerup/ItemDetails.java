@@ -33,7 +33,7 @@ public class ItemDetails extends AppCompatActivity {
     public FirebaseDatabase fbDatabase;
     public FirebaseAuth fbAuth;
     public FirebaseUser fbUser;
-    public String userKey;
+    public String userKey,itemkey;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +66,7 @@ public class ItemDetails extends AppCompatActivity {
                 offer.offerby = fbUser.getUid();
                 offer.offerfor = userKey;
                 offer.offerprice = 200;
+                offer.itemid = itemkey;
                 DatabaseReference offers = databaseReference.child("offer").push();
                 offers.setValue(offer);
             }
@@ -85,6 +86,7 @@ public class ItemDetails extends AppCompatActivity {
                    if(postSnapshot.getKey().equals(s[0]))
                    {
                        PostTemplate temp = postSnapshot.getValue(PostTemplate.class);
+                       itemkey =temp.image;
                        userKey = temp.owner;
                        name.setText(temp.itemName);
                        category.setText("Category"+temp.category.get(0));
@@ -109,6 +111,6 @@ public class ItemDetails extends AppCompatActivity {
 
     class Offers
     {
-        public String offerby, offerfor; public long offerprice;
+        public String offerby, offerfor, itemid; public long offerprice;
     }
 }

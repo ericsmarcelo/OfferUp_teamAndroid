@@ -101,7 +101,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".ItemDetails"></activity>
+        <activity android:name=".ItemDetails" />
+        <activity android:name=".Notifications"></activity>
     </application>
 
 </manifest>

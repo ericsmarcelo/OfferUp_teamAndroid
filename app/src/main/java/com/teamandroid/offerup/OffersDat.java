@@ -6,7 +6,7 @@ package com.teamandroid.offerup;
 
 public class OffersDat
 {
-    public String offerby, offerfor;
+    public String offerby, offerfor,itemid;
     public long offerprice;
 
     public OffersDat()
@@ -14,10 +14,11 @@ public class OffersDat
 
     }
 
-    public OffersDat(String ob, String of, long op)
+    public OffersDat(String ob, String of, String id, long op)
     {
         this.offerby = ob;
         this.offerprice = op;
+        this.itemid = id;
         this.offerfor = of;
     }
 

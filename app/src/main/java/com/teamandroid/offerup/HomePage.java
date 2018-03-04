@@ -122,11 +122,13 @@ public class HomePage extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                count = 0;
                 for(DataSnapshot snap: dataSnapshot.getChildren())
                 {
                     OffersDat offs = snap.getValue(OffersDat.class);
-                    if(fbUser.getUid().equals(offs.offerfor))
+                    if(fbUser.getUid().equals(offs.offerfor)) {
                         count++;
+                    }
                 }
 
                 notifications.setText(count+"");
@@ -436,6 +438,11 @@ public class HomePage extends AppCompatActivity
 
         } else if (id == R.id.settings) {
             Intent intent = new Intent (this, OfferPage.class);
+            startActivity(intent);
+        }
+
+        else if (id == R.id.notifications) {
+            Intent intent = new Intent (this, Notifications.class);
             startActivity(intent);
         }
 
