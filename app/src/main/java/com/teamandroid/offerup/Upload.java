@@ -4,16 +4,18 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 public class Upload {
     public String itemName;
-    public String image;
+    public String image, owner;
+
 
     // Default constructor required for calls to
     // DataSnapshot.getValue(User.class)
     public Upload() {
     }
 
-    public Upload(String itemName, String image) {
+    public Upload(String itemName, String image, String owner) {
         this.itemName = itemName;
         this.image= image;
+        this.owner = owner;
     }
 
     public String getName() {
@@ -23,5 +25,7 @@ public class Upload {
     public String getUrl() {
         return image;
     }
+
+    public String getOwner(){return  owner;}
 }
 

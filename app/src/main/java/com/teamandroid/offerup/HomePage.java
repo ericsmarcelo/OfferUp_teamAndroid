@@ -1,10 +1,13 @@
 package com.teamandroid.offerup;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.ProgressDialog;
@@ -28,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class HomePage extends AppCompatActivity
@@ -41,7 +47,7 @@ public class HomePage extends AppCompatActivity
 
     RecyclerView recyclerView;
     public RecyclerView.Adapter adapter;
-    public DatabaseReference mDatabase;
+    public DatabaseReference mDatabase,userDatabase;
     public ProgressDialog progressDialog;
     public List<Upload> uploads;
     public String DatabasePath = "posts";
@@ -98,7 +104,28 @@ public class HomePage extends AppCompatActivity
         progressDialog.setMessage("Please wait...");
         progressDialog.show();
         mDatabase = FirebaseDatabase.getInstance().getReference(DatabasePath);
+        userDatabase = FirebaseDatabase.getInstance().getReference("users");
 
+        final HashMap<String,String> users = new HashMap<>();
+
+        userDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot usersData: dataSnapshot.getChildren())
+                {
+
+                    UserList user = usersData.getValue(UserList.class);
+                    users.put(usersData.getKey(),user.name);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -108,14 +135,23 @@ public class HomePage extends AppCompatActivity
                 //iterating through all the values in database
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     Upload upload = postSnapshot.getValue(Upload.class);
+                    upload.owner = users.get(upload.getOwner());
                     uploads.add(upload);
                 }
+
+                Collections.reverse(uploads);
                 //creating adapter
-                adapter = new RecyclerViewAdapter(getApplicationContext(), uploads);
+                adapter = new RecyclerViewAdapter(getApplicationContext(), uploads, new RecyclerViewClickListener() {
+                    @Override
+                    public void onClick(View v, int pos) {
+                        Toast.makeText(getApplicationContext(),pos+" Clicked",Toast.LENGTH_SHORT).show();
+                    }
+                });
 
                 //adding adapter to recyclerview
                 recyclerView.setAdapter(adapter);
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -128,7 +164,7 @@ public class HomePage extends AppCompatActivity
         if (fbUser != null) {
 
             // get all parameters from the User (to avoid multiple function calls per each parameter)
-            userName.setText(fbUser.getUid());
+            userName.setText(fbUser.getDisplayName());
             userEmail.setText(fbUser.getEmail());
         }
         else
@@ -136,9 +172,8 @@ public class HomePage extends AppCompatActivity
             userName.setText("Please log in");
             userEmail.setText("");
         }
-        AutoFitGridLayoutManager layoutManager = new AutoFitGridLayoutManager(this, 500);
-        recyclerView.setLayoutManager(layoutManager);
     }
+
 
     @Override
     protected void onResume() {
@@ -347,7 +382,8 @@ public class HomePage extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.settings) {
-
+            Intent intent = new Intent (this, OfferPage.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
