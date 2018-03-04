@@ -4,7 +4,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 public class Upload {
     public String itemName;
-    public String image, owner;
+    public String image, owner,key;
 
 
     // Default constructor required for calls to

@@ -38,7 +38,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
             Upload upload = uploads.get(position);
-            holder.textViewName.setText(upload.getOwner());
+            holder.textViewName.setText(upload.getName());
             Glide.with(context).load(upload.getUrl()).into(holder.imageView);
     }
 

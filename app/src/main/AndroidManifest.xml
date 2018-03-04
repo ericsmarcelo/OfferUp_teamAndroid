@@ -16,7 +16,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".Authentication"
             android:label="@string/title_activity_authentication"
@@ -83,7 +82,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OfferPage"
+        <activity
+            android:name=".OfferPage"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
@@ -93,7 +93,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name=".FirebaseInstanceIdServices"
             android:exported="false">
@@ -101,6 +100,8 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+
+        <activity android:name=".ItemDetails"></activity>
     </application>
 
 </manifest>

@@ -2,11 +2,14 @@ package com.teamandroid.offerup;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -44,6 +47,7 @@ public class HomePage extends AppCompatActivity
     NavigationView navigationView;
     private Menu menu;
     TextView userName,userEmail;
+    public int count;
 
     RecyclerView recyclerView;
     public RecyclerView.Adapter adapter;
@@ -51,6 +55,7 @@ public class HomePage extends AppCompatActivity
     public ProgressDialog progressDialog;
     public List<Upload> uploads;
     public String DatabasePath = "posts";
+    public TextView notifications;;
 
     static final int AUTH_REQUEST = 1;
     @Override
@@ -59,6 +64,9 @@ public class HomePage extends AppCompatActivity
         setContentView(R.layout.activity_home_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +116,30 @@ public class HomePage extends AppCompatActivity
 
         final HashMap<String,String> users = new HashMap<>();
 
+        DatabaseReference notificationsDB = FirebaseDatabase.getInstance().getReference("offer").child("offer");
+
+        notificationsDB.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot snap: dataSnapshot.getChildren())
+                {
+                    OffersDat offs = snap.getValue(OffersDat.class);
+                    if(fbUser.getUid().equals(offs.offerfor))
+                        count++;
+                }
+
+                notifications.setText(count+"");
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         userDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -119,6 +151,8 @@ public class HomePage extends AppCompatActivity
                     users.put(usersData.getKey(),user.name);
 
                 }
+
+                userName.setText(users.get(fbUser.getUid()));
             }
 
             @Override
@@ -135,8 +169,13 @@ public class HomePage extends AppCompatActivity
                 //iterating through all the values in database
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     Upload upload = postSnapshot.getValue(Upload.class);
-                    upload.owner = users.get(upload.getOwner());
-                    uploads.add(upload);
+                    if(!fbUser.getUid().equals(upload.owner)) {
+                        upload.owner = users.get(upload.getOwner());
+                        upload.key = postSnapshot.getKey();
+                        //Log.e("Danish: ",fbUser.getUid()+" "+upload.key);
+
+                        uploads.add(upload);
+                    }
                 }
 
                 Collections.reverse(uploads);
@@ -144,7 +183,11 @@ public class HomePage extends AppCompatActivity
                 adapter = new RecyclerViewAdapter(getApplicationContext(), uploads, new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View v, int pos) {
-                        Toast.makeText(getApplicationContext(),pos+" Clicked",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getApplicationContext(),ItemDetails.class);
+                        String s[] = {uploads.get(pos).key,uploads.get(pos).owner};
+                        intent.putExtra("Key",s);
+                        startActivity(intent);
+                        //Toast.makeText(getApplicationContext(),uploads.get(pos).key+" Clicked",Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -164,7 +207,8 @@ public class HomePage extends AppCompatActivity
         if (fbUser != null) {
 
             // get all parameters from the User (to avoid multiple function calls per each parameter)
-            userName.setText(fbUser.getDisplayName());
+            Log.e("Danish:",fbUser.getProviders().get(0));
+            userName.setText(users.get(fbUser.getUid()));
             userEmail.setText(fbUser.getEmail());
         }
         else
@@ -172,6 +216,15 @@ public class HomePage extends AppCompatActivity
             userName.setText("Please log in");
             userEmail.setText("");
         }
+
+
+//These lines should be added in the OnCreate() of your main activity
+        notifications=(TextView) MenuItemCompat.getActionView(navigationView.getMenu().
+                findItem(R.id.notifications));
+
+        notifications.setGravity(Gravity.CENTER_VERTICAL);
+        notifications.setTypeface(null, Typeface.BOLD);
+        notifications.setTextColor(getResources().getColor(R.color.colorAccent));
     }
 
 
@@ -410,6 +463,7 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.profile).setVisible(false);
         }
     }
+
 
 
 }

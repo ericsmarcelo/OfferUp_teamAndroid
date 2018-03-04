@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
         <item
@@ -11,7 +12,8 @@
         <item
             android:id="@+id/notifications"
             android:icon="@drawable/ic_notifications"
-            android:title="Notifications" />
+            android:title="Notifications"
+            app:actionViewClass="android.widget.TextView" />
         <item
             android:id="@+id/posts"
             android:icon="@drawable/ic_offers"
