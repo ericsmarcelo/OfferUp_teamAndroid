@@ -19,10 +19,6 @@ public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<Post> mPosts;
 
-    public ImageAdapter(Context c) {
-        mContext = c;
-    }
-
     public ImageAdapter(Context c, ArrayList<Post> posts) {
         mContext = c;
         mPosts = posts;
@@ -69,24 +65,5 @@ public class ImageAdapter extends BaseAdapter {
         return postTile;
     }
 
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//        ImageView imageView;
-//        if (convertView == null) {
-//            // if it's not recycled, initialize some attributes
-//            imageView = new ImageView(mContext);
-//            imageView.setLayoutParams(new GridView.LayoutParams(300, 300));
-//            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//            imageView.setPadding(8, 8, 8, 8);
-//        } else {
-//            imageView = (ImageView) convertView;
-//        }
-//        String url = getItem(position).getImage();
-//        Picasso.with(mContext)
-//                .load(url)
-//                .placeholder(R.drawable.ic_load)
-//                .fit()
-//                .centerCrop().into(imageView);
-//        return imageView;
-//    }
 
 }
