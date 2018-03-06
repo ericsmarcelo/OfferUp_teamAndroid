@@ -126,7 +126,7 @@ public class HomePage extends AppCompatActivity
                 for(DataSnapshot snap: dataSnapshot.getChildren())
                 {
                     OffersDat offs = snap.getValue(OffersDat.class);
-                    if(fbUser.getUid().equals(offs.offerfor)) {
+                    if(fbUser!=null && fbUser.getUid().equals(offs.offerfor)) {
                         count++;
                     }
                 }
@@ -154,7 +154,10 @@ public class HomePage extends AppCompatActivity
 
                 }
 
+                if(fbUser!=null)
                 userName.setText(users.get(fbUser.getUid()));
+                else
+                    userName.setText("Offer Up");
             }
 
             @Override
@@ -171,7 +174,15 @@ public class HomePage extends AppCompatActivity
                 //iterating through all the values in database
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     Upload upload = postSnapshot.getValue(Upload.class);
-                    if(!fbUser.getUid().equals(upload.owner)) {
+                    if(fbUser!=null && !fbUser.getUid().equals(upload.owner)) {
+                        upload.owner = users.get(upload.getOwner());
+                        upload.key = postSnapshot.getKey();
+                        //Log.e("Danish: ",fbUser.getUid()+" "+upload.key);
+
+                        uploads.add(upload);
+                    }
+                    else
+                    {
                         upload.owner = users.get(upload.getOwner());
                         upload.key = postSnapshot.getKey();
                         //Log.e("Danish: ",fbUser.getUid()+" "+upload.key);
