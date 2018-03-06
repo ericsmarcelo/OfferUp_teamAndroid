@@ -5,13 +5,17 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -41,8 +45,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
+import com.teamandroid.offerup.ui.activities.UserListingActivity;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class HomePage extends AppCompatActivity
@@ -53,14 +60,16 @@ public class HomePage extends AppCompatActivity
     NavigationView navigationView;
     private Menu menu;
     TextView userName,userEmail;
+    public int count;
 
     RecyclerView recyclerView;
     public RecyclerView.Adapter adapter;
-    public DatabaseReference mDatabase;
+    public DatabaseReference mDatabase,userDatabase;
     public ProgressDialog progressDialog;
     public List<Upload> uploads;
     public List<String> categories;
     public String DatabasePath = "posts";
+    public TextView notifications;;
 
     static final int AUTH_REQUEST = 1;
     static final int REGISTRATION_REQUEST = 2;
@@ -71,6 +80,9 @@ public class HomePage extends AppCompatActivity
         setContentView(R.layout.activity_home_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -116,7 +128,59 @@ public class HomePage extends AppCompatActivity
         progressDialog.setMessage("Please wait...");
         progressDialog.show();
         mDatabase = FirebaseDatabase.getInstance().getReference(DatabasePath);
+        userDatabase = FirebaseDatabase.getInstance().getReference("users");
 
+        final HashMap<String,String> users = new HashMap<>();
+
+        DatabaseReference notificationsDB = FirebaseDatabase.getInstance().getReference("offer").child("offer");
+
+        notificationsDB.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                count = 0;
+                for(DataSnapshot snap: dataSnapshot.getChildren())
+                {
+                    OffersDat offs = snap.getValue(OffersDat.class);
+                    if(fbUser!=null && fbUser.getUid().equals(offs.offerfor)) {
+                        count++;
+                    }
+                }
+
+                notifications.setText(count+"");
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        userDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot usersData: dataSnapshot.getChildren())
+                {
+
+                    UserList user = usersData.getValue(UserList.class);
+                    users.put(usersData.getKey(),user.name);
+
+                }
+
+                if(fbUser!=null)
+                userName.setText(users.get(fbUser.getUid()));
+                else
+                    userName.setText("Offer Up");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -126,14 +190,40 @@ public class HomePage extends AppCompatActivity
                 //iterating through all the values in database
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     Upload upload = postSnapshot.getValue(Upload.class);
-                    uploads.add(upload);
+                    if(fbUser!=null && !fbUser.getUid().equals(upload.owner)) {
+                        upload.owner = users.get(upload.getOwner());
+                        upload.key = postSnapshot.getKey();
+                        //Log.e("Danish: ",fbUser.getUid()+" "+upload.key);
+
+                        uploads.add(upload);
+                    }
+                    else
+                    {
+                        upload.owner = users.get(upload.getOwner());
+                        upload.key = postSnapshot.getKey();
+                        //Log.e("Danish: ",fbUser.getUid()+" "+upload.key);
+
+                        uploads.add(upload);
+                    }
                 }
+
+                Collections.reverse(uploads);
                 //creating adapter
-                adapter = new RecyclerViewAdapter(getApplicationContext(), uploads);
+                adapter = new RecyclerViewAdapter(getApplicationContext(), uploads, new RecyclerViewClickListener() {
+                    @Override
+                    public void onClick(View v, int pos) {
+                        Intent intent = new Intent(getApplicationContext(),ItemDetails.class);
+                        String s[] = {uploads.get(pos).key,uploads.get(pos).owner};
+                        intent.putExtra("Key",s);
+                        startActivity(intent);
+                        //Toast.makeText(getApplicationContext(),uploads.get(pos).key+" Clicked",Toast.LENGTH_SHORT).show();
+                    }
+                });
 
                 //adding adapter to recyclerview
                 recyclerView.setAdapter(adapter);
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -160,7 +250,16 @@ public class HomePage extends AppCompatActivity
                         filteredList.add(item);
                     }
                 }
-                adapter = new RecyclerViewAdapter(getApplicationContext(), filteredList);
+                adapter = new RecyclerViewAdapter(getApplicationContext(), uploads, new RecyclerViewClickListener() {
+                    @Override
+                    public void onClick(View v, int pos) {
+                        Intent intent = new Intent(getApplicationContext(),ItemDetails.class);
+                        String s[] = {uploads.get(pos).key,uploads.get(pos).owner};
+                        intent.putExtra("Key",s);
+                        startActivity(intent);
+                        //Toast.makeText(getApplicationContext(),uploads.get(pos).key+" Clicked",Toast.LENGTH_SHORT).show();
+                    }
+                });
                 recyclerView.setAdapter(adapter);
             }
         });
@@ -171,7 +270,8 @@ public class HomePage extends AppCompatActivity
         if (fbUser != null) {
 
             // get all parameters from the User (to avoid multiple function calls per each parameter)
-            userName.setText(fbUser.getUid());
+            Log.e("Danish:",fbUser.getProviders().get(0));
+            userName.setText(users.get(fbUser.getUid()));
             userEmail.setText(fbUser.getEmail());
         }
         else
@@ -179,9 +279,17 @@ public class HomePage extends AppCompatActivity
             userName.setText("Please log in");
             userEmail.setText("");
         }
-        AutoFitGridLayoutManager layoutManager = new AutoFitGridLayoutManager(this, 500);
-        recyclerView.setLayoutManager(layoutManager);
+
+
+//These lines should be added in the OnCreate() of your main activity
+        notifications=(TextView) MenuItemCompat.getActionView(navigationView.getMenu().
+                findItem(R.id.notifications));
+
+        notifications.setGravity(Gravity.CENTER_VERTICAL);
+        notifications.setTypeface(null, Typeface.BOLD);
+        notifications.setTextColor(getResources().getColor(R.color.colorAccent));
     }
+
 
     @Override
     protected void onResume() {
@@ -407,7 +515,17 @@ public class HomePage extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.settings) {
+            Intent intent = new Intent (this, OfferPage.class);
+            startActivity(intent);
+        }
 
+        else if (id == R.id.notifications) {
+            Intent intent = new Intent (this, Notifications.class);
+            startActivity(intent);
+        }else if (id == R.id.message){
+            Intent intent = new Intent (this, UserListingActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -425,6 +543,7 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.signup).setVisible(false);
             navMenu.findItem(R.id.logout).setVisible(true);
             navMenu.findItem(R.id.profile).setVisible(true);
+            navMenu.findItem(R.id.message).setVisible(true);
         }
         else {
             // if user is not logged in, hide the "log out" and "profile" options in menu
@@ -432,6 +551,7 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.signup).setVisible(true);
             navMenu.findItem(R.id.logout).setVisible(false);
             navMenu.findItem(R.id.profile).setVisible(false);
+            navMenu.findItem(R.id.message).setVisible(false);
         }
     }
 
@@ -502,5 +622,6 @@ public class HomePage extends AppCompatActivity
             searchText.startAnimation(a);
         }
     }
+
 
 }

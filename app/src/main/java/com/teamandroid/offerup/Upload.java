@@ -5,8 +5,9 @@ import java.util.List;
 
 public class Upload {
     public String itemName;
-    public String image;
     public List<String> category;
+    public String image, owner,key;
+
 
     // Default constructor required for calls to
     // DataSnapshot.getValue(User.class)
@@ -15,8 +16,14 @@ public class Upload {
 
     public Upload(String itemName, String image, List<String> category) {
         this.itemName = itemName;
-        this.image= image;
+        this.image = image;
         this.category = category;
+    }
+
+    public Upload(String itemName, String image, String owner) {
+        this.itemName = itemName;
+        this.image= image;
+        this.owner = owner;
     }
 
     public String getName() {
@@ -26,5 +33,6 @@ public class Upload {
         return image;
     }
     public List<String> getCategory() { return category; }
+    public String getOwner(){return  owner;}
 }
 

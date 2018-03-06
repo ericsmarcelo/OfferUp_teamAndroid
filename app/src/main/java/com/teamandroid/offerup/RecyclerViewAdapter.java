@@ -13,28 +13,32 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 import java.util.ArrayList;
 
+interface RecyclerViewClickListener {
+    void onClick(View v, int pos);
+}
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private Context context;
-    public List<Upload> uploads;
+    private List<Upload> uploads;
+    private RecyclerViewClickListener mListener;
 
-    public RecyclerViewAdapter(Context context, List<Upload> uploads) {
+    public RecyclerViewAdapter(Context context, List<Upload> uploads, RecyclerViewClickListener mListener) {
         this.uploads = uploads;
         this.context = context;
+        this.mListener = mListener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycler_view_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(v);
+        ViewHolder viewHolder = new ViewHolder(v,mListener);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Upload upload = uploads.get(position);
-
         holder.textViewName.setText(upload.getName());
         Glide.with(context).load(upload.getUrl()).into(holder.imageView);
     }
@@ -49,16 +53,31 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private RecyclerViewClickListener mListener;
+
+       public ViewHolder(View itemView, RecyclerViewClickListener listener) {
+            super(itemView);
+            textViewName = (TextView) itemView.findViewById(R.id.textViewName);
+            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+            mListener = listener;
+            itemView.setOnClickListener(this);
+        }
+
+
+
+        @Override
+        public void onClick(View view) {
+
+            mListener.onClick(view,getAdapterPosition());
+        }
 
         public TextView textViewName;
         public ImageView imageView;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
 
-            textViewName = (TextView) itemView.findViewById(R.id.textViewName);
-            imageView = (ImageView) itemView.findViewById(R.id.imageView);
-        }
+
     }
 }

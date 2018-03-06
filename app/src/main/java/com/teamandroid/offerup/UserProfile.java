@@ -89,8 +89,14 @@ public class UserProfile extends AppCompatActivity {
         rating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(flag)
-                new RatingBarDialog().show(getFragmentManager(),"rating");
+                if(flag) {
+                    RatingBarDialog ratingBarDialog = new RatingBarDialog();
+                    Bundle args = new Bundle();
+                    args.putString("profileUid", profileUid);
+                    ratingBarDialog.setArguments(args);
+                    ratingBarDialog.show(getFragmentManager(),"rating");
+                }
+
             }
         });
 
@@ -154,6 +160,18 @@ public class UserProfile extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
+        //Toast.makeText(this, "onCreateOptionsMenu", Toast.LENGTH_SHORT).show();
+
+        if (menu != null && menu.findItem(1) == null) {
+            FirebaseUser firebaseUser = fbAuth.getCurrentUser();
+            if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
+                // if profile email matches current logged in user email, then show edit profile button
+                flag =false;
+                MenuItem editProfile = menu.add(1, 1, 101, "Edit Profile");
+                editProfile.setIcon(R.drawable.edit);
+                editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
+        }
         return true;
     }
 
@@ -167,7 +185,9 @@ public class UserProfile extends AppCompatActivity {
         return true;
     }
 
-    static public void addRatingToUser(float newRating) {
+    static public void addRatingToUser(float newRating, String profileUid) {
+
+
         // calculate new rating within User class
         dbUser.addRating((double)newRating);
 
@@ -177,7 +197,7 @@ public class UserProfile extends AppCompatActivity {
 
         // add new rating and ratingCount to firebase
         FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(fbUser.getUid());
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(profileUid);
         userRef.child("rating").setValue(dbUser.getRating());
         userRef.child("ratingCount").setValue(dbUser.getRatingCount());
 
@@ -228,6 +248,7 @@ public class UserProfile extends AppCompatActivity {
 
                 // add edit profile to action bar if profile email matches logged in user
                 // only check if the menu item has not yet been added to action bar
+                //Toast.makeText(UserProfile.this, "checking if menu is null... ", Toast.LENGTH_SHORT).show();
                 if (menu != null && menu.findItem(1) == null) {
                     FirebaseUser firebaseUser = fbAuth.getCurrentUser();
                     if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
@@ -306,11 +327,17 @@ public class UserProfile extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
                     String postKey = userPostIdList.get(position);
-                    Toast.makeText(getApplicationContext(), postKey,
-                            Toast.LENGTH_SHORT).show();
+                    String ownerKey = dbUser.getName();
+                    //Toast.makeText(getApplicationContext(), postKey,
+                            //Toast.LENGTH_SHORT).show();
 
                     // TODO: Start Activity to view item <postKey>
                     // TODO: Remove Toast
+
+                    Intent intent = new Intent(getApplicationContext(), ItemDetails.class);
+                    String s[] = {postKey, ownerKey};
+                    intent.putExtra("Key", s);
+                    startActivity(intent);
                 }
             });
         }
