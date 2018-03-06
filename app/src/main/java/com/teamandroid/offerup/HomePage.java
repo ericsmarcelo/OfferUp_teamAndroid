@@ -250,6 +250,11 @@ public class HomePage extends AppCompatActivity
                         filteredList.add(item);
                     }
                 }
+                // TODO: This commented line implements search filtering based on the editText search bar.
+                // TODO: However, currently it doesn't update the relevent positions in the recycler view.
+                // TODO: We need to update the positions in order to be able to view the correct item details
+                // TODO: when we click on it. So with the current line, the search filtering does not work.
+                //adapter = new RecyclerViewAdapter(getApplicationContext(), filteredList, new RecyclerViewClickListener() {
                 adapter = new RecyclerViewAdapter(getApplicationContext(), uploads, new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View v, int pos) {
