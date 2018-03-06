@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
+import com.teamandroid.offerup.ui.activities.UserListingActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -455,6 +456,10 @@ public class HomePage extends AppCompatActivity
         else if (id == R.id.notifications) {
             Intent intent = new Intent (this, Notifications.class);
             startActivity(intent);
+        }else if (id == R.id.message){
+            Intent intent = new Intent (this, UserListingActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -472,6 +477,7 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.signup).setVisible(false);
             navMenu.findItem(R.id.logout).setVisible(true);
             navMenu.findItem(R.id.profile).setVisible(true);
+            navMenu.findItem(R.id.message).setVisible(true);
         }
         else {
             // if user is not logged in, hide the "log out" and "profile" options in menu
@@ -479,6 +485,7 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.signup).setVisible(true);
             navMenu.findItem(R.id.logout).setVisible(false);
             navMenu.findItem(R.id.profile).setVisible(false);
+            navMenu.findItem(R.id.message).setVisible(false);
         }
     }
 
