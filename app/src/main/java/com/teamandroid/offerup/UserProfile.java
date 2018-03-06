@@ -216,7 +216,7 @@ public class UserProfile extends AppCompatActivity {
 
                 // add edit profile to action bar if profile email matches logged in user
                 // only check if the menu item has not yet been added to action bar
-                if (menu.findItem(1) == null) {
+                if (menu != null && menu.findItem(1) == null) {
                     FirebaseUser firebaseUser = fbAuth.getCurrentUser();
                     if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
                         // if profile email matches current logged in user email, then show edit profile button
