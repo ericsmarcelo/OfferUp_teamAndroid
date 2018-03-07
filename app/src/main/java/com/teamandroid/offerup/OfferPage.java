@@ -92,8 +92,10 @@ public class OfferPage extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 currentItem = dataSnapshot.getValue(Post.class);
-                if (currentItem != null && currentItem.getOffers() != null) {
-                    listOffers = currentItem.getOffers();
+                if (currentItem != null) {
+                    if (currentItem.getOffers() != null) {
+                        listOffers = currentItem.getOffers();
+                    }
 
                     itemName.setText(currentItem.getItemName());
                     sellerPrice.setText("$" + String.format("%.2f", currentItem.getPrice()));
