@@ -3,8 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
 
     <LinearLayout
         android:id="@+id/makeoffer"
@@ -17,7 +21,8 @@
             android:id="@+id/prodImg"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="5dp"/>
 
         <LinearLayout
             android:id="@+id/name-price"
@@ -62,6 +67,11 @@
                 android:textStyle="italic"
                 android:textColor="#000" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+
             <TextView
                 android:id="@+id/condition"
                 android:layout_width="160dp"
@@ -71,6 +81,11 @@
                 android:textSize="16sp"
                 android:textStyle="italic"
                 android:textColor="#000" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
         </LinearLayout>
 
         <LinearLayout
@@ -91,8 +106,13 @@
                 android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Long text Long text Long text Long text Long text Long text Long text"
+                android:text="Long text Long text Long text Long text Long text Long text Long text even longer text even longer text even longer text even longer text"
                 android:textColor="#000" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -110,9 +130,13 @@
                 android:text="Shweti"
                 android:textSize="18sp"
                 android:textStyle="normal"
-                android:textColor="#000" />
+                android:textColor="#000"
+                android:layout_marginBottom="7dp"/>
         </LinearLayout>
     </LinearLayout>
+
+
+</ScrollView>
 
     <LinearLayout
         android:id="@+id/makeOfferLayout"
