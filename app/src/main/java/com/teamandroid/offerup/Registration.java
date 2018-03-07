@@ -117,6 +117,8 @@ public class Registration extends AppCompatActivity {
                             // get firebase uid of current logged in user
                             String uid = task.getResult().getUser().getUid();
 
+                            dbUser.setUid(uid);
+
                             // add user to RealtimeDatabase
                             database.getReference("users").child(uid).setValue(dbUser);
 

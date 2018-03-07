@@ -1,21 +1,15 @@
 package com.teamandroid.offerup.models;
 
-/**
- * Created by User on 2/28/2018.
- */
-
-// TO BE DEPRECATED FOR ChatUser class
-
-public class User {
+public class ChatUser {
     public String uid;
     public String email;
     public String firebaseToken;
 
-    public User(){
+    public ChatUser() {
 
     }
 
-    public User(String uid, String email, String firebaseToken){
+    public ChatUser(String uid, String email, String firebaseToken){
 
         this.uid = uid;
         this.email = email;

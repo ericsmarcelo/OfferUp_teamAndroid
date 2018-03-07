@@ -2,6 +2,7 @@ package com.teamandroid.offerup.core.users.getall;
 
 import android.text.TextUtils;
 
+import com.teamandroid.offerup.models.ChatUser;
 import com.teamandroid.offerup.models.User;
 import com.teamandroid.offerup.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,10 +33,10 @@ public class GetUsersInteractor implements GetUsersContract.Interactor {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> dataSnapshots = dataSnapshot.getChildren().iterator();
-                List<User> users = new ArrayList<>();
+                List<ChatUser> users = new ArrayList<>();
                 while (dataSnapshots.hasNext()) {
                     DataSnapshot dataSnapshotChild = dataSnapshots.next();
-                    User user = dataSnapshotChild.getValue(User.class);
+                    ChatUser user = dataSnapshotChild.getValue(ChatUser.class);
                     if (!TextUtils.equals(user.uid, FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                         users.add(user);
                     }
