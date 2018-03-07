@@ -100,7 +100,14 @@ public class ItemFormPage4 extends AppCompatActivity {
         Bitmap postImage = null;
 
         if (b.getBundle("IMAGE") != null) {
-            postImage = (Bitmap)b.getBundle("IMAGE").get("data");
+            //postImage = (Bitmap)b.getBundle("IMAGE").get("data");
+            Uri imageUri = Uri.parse(b.getString("IMAGE"));
+            try {
+                postImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            } catch(IOException e) {
+                e.printStackTrace();
+                Toast.makeText(ItemFormPage4.this, "Loading image failed.", Toast.LENGTH_SHORT).show();
+            }
         }
         else if (b.getString("IMAGE_URI") != null) {
             Uri imageUri = Uri.parse(b.getString("IMAGE_URI"));
@@ -110,7 +117,6 @@ public class ItemFormPage4 extends AppCompatActivity {
                 int imageWidth = postImage.getWidth();
                 int imageHeight = postImage.getHeight();
                 if (imageWidth > 2000 || imageHeight > 2000) {
-                    // Toast.makeText(ItemFormPage4.this, "Resizing large image...", Toast.LENGTH_SHORT).show();
                     imageWidth = (int)(imageWidth*0.25);
                     imageHeight = (int)(imageHeight*0.25);
                     postImage = Bitmap.createScaledBitmap(postImage, imageWidth, imageHeight, true);
