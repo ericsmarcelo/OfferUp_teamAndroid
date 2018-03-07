@@ -35,7 +35,12 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_huge"
         android:layout_marginRight="@dimen/margin_small"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
         android:background="@drawable/chat_rounded_rect_bg"
+        android:backgroundTint="@color/grey_600"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/grey_100"
         tools:text="Hello mate how are you doing?" />
