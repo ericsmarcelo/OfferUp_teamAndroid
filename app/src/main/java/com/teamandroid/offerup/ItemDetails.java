@@ -75,12 +75,22 @@ public class ItemDetails extends AppCompatActivity {
         makeoffer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            Intent intent = new Intent(ItemDetails.this, OfferPage.class);
-            intent.putExtra("ITEM_PRICE", currentItem.getPrice());
-            intent.putExtra("ITEM_ID", s[0]);
-            intent.putExtra("ITEM_OWNER", currentItem.getOwner());
-            intent.putExtra("ITEM_NAME", currentItem.getItemName());
-            startActivity(intent);
+
+            if(fbAuth.getCurrentUser() == null){
+
+
+                Toast.makeText(getBaseContext(), "Error, user not logged in.", Toast.LENGTH_SHORT).show();
+
+            }
+
+            else {
+                Intent intent = new Intent(ItemDetails.this, OfferPage.class);
+                intent.putExtra("ITEM_PRICE", currentItem.getPrice());
+                intent.putExtra("ITEM_ID", s[0]);
+                intent.putExtra("ITEM_OWNER", currentItem.getOwner());
+                intent.putExtra("ITEM_NAME", currentItem.getItemName());
+                startActivity(intent);
+            }
 
             }
         });
@@ -114,7 +124,7 @@ public class ItemDetails extends AppCompatActivity {
                             break;
                     }
 
-                    price.setText("$" + (int)currentItem.getPrice());
+                    price.setText("$" + String.format("%.2f", currentItem.getPrice()));
                     description.setText(currentItem.getDescription());
                     user.setText(s[1]);
                     Glide.with(getApplicationContext()).load(currentItem.getImage()).into(photo);
