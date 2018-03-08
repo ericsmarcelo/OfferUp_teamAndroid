@@ -4,6 +4,12 @@
     tools:context="com.teamandroid.offerup.Welcome">
 
     <item
+        android:id="@+id/action_search"
+        android:orderInCategory="101"
+        android:title="Search"
+        android:icon="@drawable/ic_search_black_24dp"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/action_registration"
         android:orderInCategory="102"
         android:icon="@drawable/ic_registration"

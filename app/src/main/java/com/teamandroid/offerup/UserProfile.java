@@ -42,6 +42,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 public class UserProfile extends AppCompatActivity {
 
     private String profileUid;
@@ -56,6 +58,9 @@ public class UserProfile extends AppCompatActivity {
     private boolean flag;
     private Menu menu;
 
+    public ArrayList<Post> userPostList;
+    public ArrayList<String> userPostIdList;
+
     public final int EDIT_PROFILE = 1;
 
     @Override
@@ -68,6 +73,8 @@ public class UserProfile extends AppCompatActivity {
         // profileUid is the ID of the profile we are viewing, doesn't have to be the same as
         // the current logged in user
         profileUid = getIntent().getStringExtra("profileUid");
+        userPostList = new ArrayList<>();
+        userPostIdList = new ArrayList<>();
 
         //User Profile display
         userName = (TextView) findViewById(R.id.userNameText);
@@ -82,8 +89,14 @@ public class UserProfile extends AppCompatActivity {
         rating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(flag)
-                new RatingBarDialog().show(getFragmentManager(),"rating");
+                if(flag) {
+                    RatingBarDialog ratingBarDialog = new RatingBarDialog();
+                    Bundle args = new Bundle();
+                    args.putString("profileUid", profileUid);
+                    ratingBarDialog.setArguments(args);
+                    ratingBarDialog.show(getFragmentManager(),"rating");
+                }
+
             }
         });
 
@@ -100,16 +113,20 @@ public class UserProfile extends AppCompatActivity {
         });
 
         ImageView userImg = (ImageView) findViewById(R.id.userpic);
-        GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
 
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Toast.makeText(getApplicationContext(), "" + position,
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        GridView gridview = (GridView) findViewById(R.id.gridview);
+        // create array of Post class objects that contain only posts from the current user at (profileUid)
+
+//        gridview.setAdapter(new ImageAdapter(this)); //do this when event listener of posts is done
+
+
+//        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            public void onItemClick(AdapterView<?> parent, View v,
+//                                    int position, long id) {
+//                Toast.makeText(getApplicationContext(), "" + position,
+//                        Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         Picasso.with(getApplicationContext())
                 .load("http://via.placeholder.com/350x350")
@@ -122,6 +139,7 @@ public class UserProfile extends AppCompatActivity {
         if (profileUid != null) {
             database.getReference("users").child(profileUid).addListenerForSingleValueEvent(userListener);
             database.getReference("users").child(profileUid).child("photo").addValueEventListener(profilePictureListener);
+            database.getReference("posts").addListenerForSingleValueEvent(postListener);
         }
         else {
             // bad
@@ -142,6 +160,18 @@ public class UserProfile extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
+        //Toast.makeText(this, "onCreateOptionsMenu", Toast.LENGTH_SHORT).show();
+
+        if (menu != null && menu.findItem(1) == null) {
+            FirebaseUser firebaseUser = fbAuth.getCurrentUser();
+            if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
+                // if profile email matches current logged in user email, then show edit profile button
+                flag =false;
+                MenuItem editProfile = menu.add(1, 1, 101, "Edit Profile");
+                editProfile.setIcon(R.drawable.edit);
+                editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
+        }
         return true;
     }
 
@@ -155,7 +185,9 @@ public class UserProfile extends AppCompatActivity {
         return true;
     }
 
-    static public void addRatingToUser(float newRating) {
+    static public void addRatingToUser(float newRating, String profileUid) {
+
+
         // calculate new rating within User class
         dbUser.addRating((double)newRating);
 
@@ -165,7 +197,7 @@ public class UserProfile extends AppCompatActivity {
 
         // add new rating and ratingCount to firebase
         FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(fbUser.getUid());
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(profileUid);
         userRef.child("rating").setValue(dbUser.getRating());
         userRef.child("ratingCount").setValue(dbUser.getRatingCount());
 
@@ -216,7 +248,12 @@ public class UserProfile extends AppCompatActivity {
 
                 // add edit profile to action bar if profile email matches logged in user
                 // only check if the menu item has not yet been added to action bar
+<<<<<<< HEAD
                 if (menu!=null && menu.findItem(1) == null) {
+=======
+                //Toast.makeText(UserProfile.this, "checking if menu is null... ", Toast.LENGTH_SHORT).show();
+                if (menu != null && menu.findItem(1) == null) {
+>>>>>>> 2f306493328ec04fb8fd66fd690caee2d367827d
                     FirebaseUser firebaseUser = fbAuth.getCurrentUser();
                     if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
                         // if profile email matches current logged in user email, then show edit profile button
@@ -268,6 +305,50 @@ public class UserProfile extends AppCompatActivity {
         @Override
         public void onCancelled(DatabaseError databaseError) {
             // do nothing
+        }
+    };
+
+    ValueEventListener postListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // loop over all posts
+            // if owner matches profile we are viewing, add them to list
+            for (DataSnapshot postRef : dataSnapshot.getChildren()) {
+                Post post = postRef.getValue(Post.class);
+                if (post != null && post.getOwner().equals(profileUid)) {
+                    // keep separate list of posts and postIds because the posts themselves do not
+                    // store their own ids. However these will be in the same order in both lists
+                    // so that we can easily access the id of whichever post we want
+                    userPostList.add(post);
+                    userPostIdList.add(postRef.getKey());
+                }
+            }
+
+            // set grid image adapter, pass in the list
+            GridView gridViewPosts = findViewById(R.id.gridview);
+            gridViewPosts.setAdapter(new ImageAdapter(UserProfile.this, userPostList));
+            gridViewPosts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    String postKey = userPostIdList.get(position);
+                    String ownerKey = dbUser.getName();
+                    //Toast.makeText(getApplicationContext(), postKey,
+                            //Toast.LENGTH_SHORT).show();
+
+                    // TODO: Start Activity to view item <postKey>
+                    // TODO: Remove Toast
+
+                    Intent intent = new Intent(getApplicationContext(), ItemDetails.class);
+                    String s[] = {postKey, ownerKey};
+                    intent.putExtra("Key", s);
+                    startActivity(intent);
+                }
+            });
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
         }
     };
 

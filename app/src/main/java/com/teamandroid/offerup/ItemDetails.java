@@ -34,6 +34,8 @@ public class ItemDetails extends AppCompatActivity {
     public FirebaseAuth fbAuth;
     public FirebaseUser fbUser;
     public String userKey,itemkey;
+    public Post currentItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +47,11 @@ public class ItemDetails extends AppCompatActivity {
         fbDatabase = FirebaseDatabase.getInstance();
         fbAuth = FirebaseAuth.getInstance();
         fbUser = fbAuth.getCurrentUser();
+        currentItem = new Post();
 
         final DatabaseReference databaseReference = fbDatabase.getReference("offer");
 
-       final String s[] =getIntent().getStringArrayExtra("Key");
+        final String s[] =getIntent().getStringArrayExtra("Key");
         Log.e("Danish: ",s[0]);
         name = (TextView) findViewById(R.id.itemName);
         price = (TextView) findViewById(R.id.price);
@@ -57,54 +60,70 @@ public class ItemDetails extends AppCompatActivity {
         category = (TextView) findViewById(R.id.category);
         user = (TextView) findViewById(R.id.postedBy);
         photo = (ImageView) findViewById(R.id.prodImg);
-        makeoffer = (LinearLayout) findViewById(R.id.makeoffer);
+        makeoffer = (LinearLayout) findViewById(R.id.makeOfferLayout);
+
+        user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ItemDetails.this, UserProfile.class);
+                intent.putExtra("profileUid", currentItem.getOwner());
+                startActivity(intent);
+            }
+        });
+
 
         makeoffer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Offers offer = new Offers();
-                offer.offerby = fbUser.getUid();
-                offer.offerfor = userKey;
-                offer.offerprice = 200;
-                offer.itemid = itemkey;
-                DatabaseReference offers = databaseReference.child("offer").push();
-                offers.setValue(offer);
+            Intent intent = new Intent(ItemDetails.this, OfferPage.class);
+            intent.putExtra("ITEM_PRICE", currentItem.getPrice());
+            intent.putExtra("ITEM_ID", s[0]);
+            intent.putExtra("ITEM_OWNER", currentItem.getOwner());
+            intent.putExtra("ITEM_NAME", currentItem.getItemName());
+            startActivity(intent);
+
             }
         });
 
-        mDatabase = FirebaseDatabase.getInstance().getReference("posts");
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("posts").child(s[0]).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                //dismissing the progress dialog
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 progressDialog.dismiss();
 
-                //iterating through all the values in database
-                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    Log.e("Danish: ",postSnapshot.getKey());
-                   if(postSnapshot.getKey().equals(s[0]))
-                   {
-                       PostTemplate temp = postSnapshot.getValue(PostTemplate.class);
-                       itemkey =temp.image;
-                       userKey = temp.owner;
-                       name.setText(temp.itemName);
-                       category.setText("Category"+temp.category.get(0));
-                       condition.setText("Condition"+temp.condition);
-                       price.setText("$"+(int)temp.price+"");
-                       description.setText(temp.description);
-                       user.setText(s[1]);
-                       Glide.with(getApplicationContext()).load(temp.image).into(photo);
-                   }
+                currentItem = dataSnapshot.getValue(Post.class);
+                if (currentItem != null) {
+                    itemkey = currentItem.getImage();
+                    userKey = currentItem.getOwner();
+                    name.setText(currentItem.getItemName());
+                    category.setText("Category: " + currentItem.getCategory().get(0));
+
+                    //condition.setText("Condition: " + currentItem.getCondition());
+                    switch (currentItem.getCondition()) {
+                        case "1": condition.setText("Condition: New");
+                            break;
+                        case "2": condition.setText("Condition: Good");
+                            break;
+                        case "3": condition.setText("Condition: Fair");
+                            break;
+                        case "4": condition.setText("Condition: Not Good");
+                            break;
+                        case "5": condition.setText("Condition: Very Bad");
+                            break;
+                        default: condition.setText("Condition: " + currentItem.getCondition());
+                            break;
+                    }
+
+                    price.setText("$" + (int)currentItem.getPrice());
+                    description.setText(currentItem.getDescription());
+                    user.setText(s[1]);
+                    Glide.with(getApplicationContext()).load(currentItem.getImage()).into(photo);
                 }
-
-
             }
-
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                progressDialog.dismiss();
+
             }
         });
     }

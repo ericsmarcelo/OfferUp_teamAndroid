@@ -27,6 +27,8 @@ public class RatingBarDialog extends DialogFragment
         final View view = inflater.inflate(R.layout.activity_rate_user, null);
         final RatingBar ratingBar = view.findViewById(R.id.editRatingBar);
 
+        final String profileUid = getArguments().getString("profileUid");
+
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(view)
@@ -35,7 +37,7 @@ public class RatingBarDialog extends DialogFragment
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         //Toast.makeText(getActivity(), "Rating: "+String.valueOf(ratingBar.getRating()), Toast.LENGTH_SHORT).show();
-                        UserProfile.addRatingToUser(ratingBar.getRating());
+                        UserProfile.addRatingToUser(ratingBar.getRating(), profileUid);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

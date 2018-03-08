@@ -126,7 +126,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="Condition (from 1 to 5)"
+        android:text="Condition (from 1(New) to 5(Used))"
         android:textColor="#000000"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"

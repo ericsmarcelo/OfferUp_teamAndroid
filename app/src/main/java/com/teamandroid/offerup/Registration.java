@@ -120,9 +120,10 @@ public class Registration extends AppCompatActivity {
                             // add user to RealtimeDatabase
                             database.getReference("users").child(uid).setValue(dbUser);
 
-                            // go to profile activity (should change to home page later)
-//                            Intent intent = new Intent(Registration.this, UserProfile.class);
-//                            startActivity(intent);
+                            // go back to home activity
+                            Intent intent = new Intent();
+                            intent.putExtra("registrationStatus", true);
+                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     }

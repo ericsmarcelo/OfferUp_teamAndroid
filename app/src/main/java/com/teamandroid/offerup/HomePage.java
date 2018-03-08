@@ -1,13 +1,18 @@
 package com.teamandroid.offerup;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,10 +26,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.ProgressDialog;
 import android.support.v7.widget.LinearLayoutManager;
+import android.widget.EditText;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +45,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
+import com.teamandroid.offerup.ui.activities.UserListingActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,10 +67,13 @@ public class HomePage extends AppCompatActivity
     public DatabaseReference mDatabase,userDatabase;
     public ProgressDialog progressDialog;
     public List<Upload> uploads;
+    public List<String> categories;
     public String DatabasePath = "posts";
     public TextView notifications;;
 
     static final int AUTH_REQUEST = 1;
+    static final int REGISTRATION_REQUEST = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -213,7 +229,46 @@ public class HomePage extends AppCompatActivity
             public void onCancelled(DatabaseError databaseError) {
                 progressDialog.dismiss();
             }
-    });
+        });
+
+        EditText editText = findViewById(R.id.edittext);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                ArrayList<Upload> filteredList = new ArrayList<>();
+                for(Upload item : uploads) {
+                    //itemName
+                    if(item.getName().toLowerCase().contains(s.toString().toLowerCase())) {
+                        filteredList.add(item);
+                    }
+                    //category
+                    else if(item.getCategory().get(0).toLowerCase().contains(s.toString().toLowerCase())) {
+                        filteredList.add(item);
+                    }
+                }
+                // TODO: This commented line implements search filtering based on the editText search bar.
+                // TODO: However, currently it doesn't update the relevent positions in the recycler view.
+                // TODO: We need to update the positions in order to be able to view the correct item details
+                // TODO: when we click on it. So with the current line, the search filtering does not work.
+                //adapter = new RecyclerViewAdapter(getApplicationContext(), filteredList, new RecyclerViewClickListener() {
+                adapter = new RecyclerViewAdapter(getApplicationContext(), uploads, new RecyclerViewClickListener() {
+                    @Override
+                    public void onClick(View v, int pos) {
+                        Intent intent = new Intent(getApplicationContext(),ItemDetails.class);
+                        String s[] = {uploads.get(pos).key,uploads.get(pos).owner};
+                        intent.putExtra("Key",s);
+                        startActivity(intent);
+                        //Toast.makeText(getApplicationContext(),uploads.get(pos).key+" Clicked",Toast.LENGTH_SHORT).show();
+                    }
+                });
+                recyclerView.setAdapter(adapter);
+            }
+        });
+
         userName = (TextView)header.findViewById(R.id.username);
         userEmail = (TextView) header.findViewById(R.id.email);
 
@@ -286,6 +341,12 @@ public class HomePage extends AppCompatActivity
                 menu.findItem(R.id.action_profile).setVisible(true);
             }
         }
+        else if (requestCode == REGISTRATION_REQUEST && resultCode == RESULT_OK) {
+            if(data.getBooleanExtra("registrationStatus", true)) {
+                fbUser = fbAuth.getCurrentUser();
+                menu.findItem(R.id.action_profile).setVisible(true);
+            }
+        }
     }
 
     @Override
@@ -317,6 +378,11 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.logout).setVisible(false);
             navMenu.findItem(R.id.profile).setVisible(false);
         }
+
+        // set search icon to white
+        menu.findItem(R.id.action_search).getIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+
+
         return true;
     }
 
@@ -363,6 +429,12 @@ public class HomePage extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         }
+        else if (id == R.id.action_search) {
+            final EditText searchText = findViewById(R.id.edittext);
+            // if search field is gone, then make it visible. if it is already there then hide it
+            toggleSearch(searchText);
+
+        }
         else if (id == R.id.action_authentication) {
             Intent intent = new Intent(this, Authentication.class);
             startActivityForResult(intent, AUTH_REQUEST);
@@ -370,7 +442,7 @@ public class HomePage extends AppCompatActivity
         }
         else if (id == R.id.action_registration) {
             Intent intent = new Intent (this, Registration.class);
-            startActivity(intent);
+            startActivityForResult(intent, REGISTRATION_REQUEST);
             return true;
         }
 
@@ -441,7 +513,7 @@ public class HomePage extends AppCompatActivity
         } else if (id == R.id.signup) {
 
             Intent intent = new Intent (this, Registration.class);
-            startActivity(intent);
+            startActivityForResult(intent, REGISTRATION_REQUEST);
 
         } else if (id == R.id.home) {
             Intent intent = new Intent (this, HomePage.class);
@@ -455,6 +527,10 @@ public class HomePage extends AppCompatActivity
         else if (id == R.id.notifications) {
             Intent intent = new Intent (this, Notifications.class);
             startActivity(intent);
+        }else if (id == R.id.message){
+            Intent intent = new Intent (this, UserListingActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -472,6 +548,7 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.signup).setVisible(false);
             navMenu.findItem(R.id.logout).setVisible(true);
             navMenu.findItem(R.id.profile).setVisible(true);
+            navMenu.findItem(R.id.message).setVisible(true);
         }
         else {
             // if user is not logged in, hide the "log out" and "profile" options in menu
@@ -479,9 +556,77 @@ public class HomePage extends AppCompatActivity
             navMenu.findItem(R.id.signup).setVisible(true);
             navMenu.findItem(R.id.logout).setVisible(false);
             navMenu.findItem(R.id.profile).setVisible(false);
+            navMenu.findItem(R.id.message).setVisible(false);
         }
     }
 
+    public void toggleSearch(final EditText searchText) {
+        if (searchText.getVisibility()== View.INVISIBLE) {
+            // make visible, then slide down
+
+            searchText.setVisibility(View.VISIBLE);
+
+            Animation a = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)searchText.getLayoutParams();
+                    params.topMargin = -165 + (int)(165 * interpolatedTime);
+                    searchText.setLayoutParams(params);
+                }
+            };
+            a.setDuration(300);
+            a.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    searchText.setFocusableInTouchMode(true);
+                    searchText.requestFocusFromTouch();
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (inputMethodManager != null) {
+                        inputMethodManager.toggleSoftInputFromWindow(searchText.getApplicationWindowToken(), InputMethodManager.SHOW_IMPLICIT, 0);
+                    }
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) { /* nothing */ }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) { /* nothing */ }
+            });
+            searchText.startAnimation(a);
+
+        }
+        else {
+            // slide up and then hide
+
+            Animation a = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)searchText.getLayoutParams();
+                    params.topMargin = (int)(-165 * interpolatedTime);
+                    searchText.setLayoutParams(params);
+                }
+            };
+            a.setDuration(300);
+            a.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (inputMethodManager != null) {
+                        inputMethodManager.hideSoftInputFromWindow(searchText.getApplicationWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    }
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    searchText.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) { /* nothing */ }
+            });
+            searchText.startAnimation(a);
+        }
+    }
 
 
 }
