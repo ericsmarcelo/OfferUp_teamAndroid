@@ -63,7 +63,7 @@ public class HomePage extends AppCompatActivity
     public int count;
 
     RecyclerView recyclerView;
-    public RecyclerView.Adapter adapter;
+    public RecyclerViewAdapter adapter;
     public DatabaseReference mDatabase,userDatabase;
     public ProgressDialog progressDialog;
     public List<Upload> uploads;
@@ -213,7 +213,7 @@ public class HomePage extends AppCompatActivity
                     @Override
                     public void onClick(View v, int pos) {
                         Intent intent = new Intent(getApplicationContext(),ItemDetails.class);
-                        String s[] = {uploads.get(pos).key,uploads.get(pos).owner};
+                        String s[] = {adapter.getList().get(pos).key,adapter.getList().get(pos).owner};
                         intent.putExtra("Key",s);
                         startActivity(intent);
                         //Toast.makeText(getApplicationContext(),uploads.get(pos).key+" Clicked",Toast.LENGTH_SHORT).show();
@@ -242,30 +242,18 @@ public class HomePage extends AppCompatActivity
                 ArrayList<Upload> filteredList = new ArrayList<>();
                 for(Upload item : uploads) {
                     //itemName
-                    if(item.getName().toLowerCase().contains(s.toString().toLowerCase())) {
+                    if(item.getName().toLowerCase().contains(s.toString().toLowerCase()) || item.getCategory().get(0).toLowerCase().contains(s.toString().toLowerCase())) {
                         filteredList.add(item);
                     }
-                    //category
-                    else if(item.getCategory().get(0).toLowerCase().contains(s.toString().toLowerCase())) {
-                        filteredList.add(item);
-                    }
+
                 }
                 // TODO: This commented line implements search filtering based on the editText search bar.
                 // TODO: However, currently it doesn't update the relevent positions in the recycler view.
                 // TODO: We need to update the positions in order to be able to view the correct item details
                 // TODO: when we click on it. So with the current line, the search filtering does not work.
                 //adapter = new RecyclerViewAdapter(getApplicationContext(), filteredList, new RecyclerViewClickListener() {
-                adapter = new RecyclerViewAdapter(getApplicationContext(), uploads, new RecyclerViewClickListener() {
-                    @Override
-                    public void onClick(View v, int pos) {
-                        Intent intent = new Intent(getApplicationContext(),ItemDetails.class);
-                        String s[] = {uploads.get(pos).key,uploads.get(pos).owner};
-                        intent.putExtra("Key",s);
-                        startActivity(intent);
-                        //Toast.makeText(getApplicationContext(),uploads.get(pos).key+" Clicked",Toast.LENGTH_SHORT).show();
-                    }
-                });
-                recyclerView.setAdapter(adapter);
+
+                adapter.filterList(filteredList);
             }
         });
 

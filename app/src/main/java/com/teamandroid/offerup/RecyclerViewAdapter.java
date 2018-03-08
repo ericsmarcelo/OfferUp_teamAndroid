@@ -53,6 +53,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         notifyDataSetChanged();
     }
 
+    public List<Upload> getList()
+    {
+        return this.uploads;
+    }
+
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 

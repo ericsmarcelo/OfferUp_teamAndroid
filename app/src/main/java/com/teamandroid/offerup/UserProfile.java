@@ -229,160 +229,158 @@ public class UserProfile extends AppCompatActivity {
                 String userPhoneNumber = dbUser.getPhoneNumber();
                 String userCity = dbUser.getCity();
                 String userState = dbUser.getState();
-                ratingBar.setRating((float)dbUser.getRating());
+                ratingBar.setRating((float) dbUser.getRating());
 
                 // set all text views to the value from user, granted that the value is not empty
                 if (userPhoneNumber != null && !(userPhoneNumber.equals(""))) {
                     userPhone.setText(userPhoneNumber);
-                }
-                else {
+                } else {
                     userPhone.setText("No Phone Listed");
                 }
                 if (userCity != null && !(userCity.equals("")) && userState != null && !(userState.equals(""))) {
                     String cityAndState = userCity + ", " + userState;
                     userCityState.setText(cityAndState);
-                }
-                else {
+                } else {
                     userCityState.setText("No Location Listed");
                 }
 
                 // add edit profile to action bar if profile email matches logged in user
                 // only check if the menu item has not yet been added to action bar
-<<<<<<< HEAD
-                if (menu!=null && menu.findItem(1) == null) {
-=======
-                //Toast.makeText(UserProfile.this, "checking if menu is null... ", Toast.LENGTH_SHORT).show();
                 if (menu != null && menu.findItem(1) == null) {
->>>>>>> 2f306493328ec04fb8fd66fd690caee2d367827d
-                    FirebaseUser firebaseUser = fbAuth.getCurrentUser();
-                    if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
-                        // if profile email matches current logged in user email, then show edit profile button
-                        flag =false;
-                        MenuItem editProfile = menu.add(1, 1, 101, "Edit Profile");
-                        editProfile.setIcon(R.drawable.edit);
-                        editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                    //Toast.makeText(UserProfile.this, "checking if menu is null... ", Toast.LENGTH_SHORT).show();
+                    if (menu != null && menu.findItem(1) == null) {
+                        FirebaseUser firebaseUser = fbAuth.getCurrentUser();
+                        if (firebaseUser != null && firebaseUser.getEmail().equals(dbUser.getEmail())) {
+                            // if profile email matches current logged in user email, then show edit profile button
+                            flag = false;
+                            MenuItem editProfile = menu.add(1, 1, 101, "Edit Profile");
+                            editProfile.setIcon(R.drawable.edit);
+                            editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        }
                     }
-                }
 
+                    // get user profile picture uri (as a string) from firebase
+                    String photoString = dbUser.getPhoto();
+                    if (!photoString.equals("")) {
+                        // if string exists (not empty) then load image into imageview
+                        Uri photoUrl = Uri.parse(photoString);
+                        ImageView profilePicture = findViewById(R.id.userpic);
+                        Picasso.with(UserProfile.this).load(photoUrl).into(profilePicture);
+                    }
+                    // if string empty, don't load anything
+
+                }
+            }
+
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+        // listen for changes to "photo" field for current user in database, get profile picture
+        ValueEventListener profilePictureListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 // get user profile picture uri (as a string) from firebase
-                String photoString = dbUser.getPhoto();
-                if (!photoString.equals("")) {
+                String photoString = dataSnapshot.getValue(String.class);
+                if (photoString != null && !photoString.equals("")) {
                     // if string exists (not empty) then load image into imageview
                     Uri photoUrl = Uri.parse(photoString);
                     ImageView profilePicture = findViewById(R.id.userpic);
                     Picasso.with(UserProfile.this).load(photoUrl).into(profilePicture);
-                }
-                // if string empty, don't load anything
-
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            // do nothing
-        }
-    };
-
-    // listen for changes to "photo" field for current user in database, get profile picture
-    ValueEventListener profilePictureListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            // get user profile picture uri (as a string) from firebase
-            String photoString = dataSnapshot.getValue(String.class);
-            if (photoString != null && !photoString.equals("")) {
-                // if string exists (not empty) then load image into imageview
-                Uri photoUrl = Uri.parse(photoString);
-                ImageView profilePicture = findViewById(R.id.userpic);
-                Picasso.with(UserProfile.this).load(photoUrl).into(profilePicture);
-            }
-            else if (photoString.equals("")) {
-                // clear photo back to placeholder
-                ImageView profilePicture = findViewById(R.id.userpic);
-                profilePicture.setImageResource(R.color.lightGrey);
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            // do nothing
-        }
-    };
-
-    ValueEventListener postListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            // loop over all posts
-            // if owner matches profile we are viewing, add them to list
-            for (DataSnapshot postRef : dataSnapshot.getChildren()) {
-                Post post = postRef.getValue(Post.class);
-                if (post != null && post.getOwner().equals(profileUid)) {
-                    // keep separate list of posts and postIds because the posts themselves do not
-                    // store their own ids. However these will be in the same order in both lists
-                    // so that we can easily access the id of whichever post we want
-                    userPostList.add(post);
-                    userPostIdList.add(postRef.getKey());
+                } else if (photoString.equals("")) {
+                    // clear photo back to placeholder
+                    ImageView profilePicture = findViewById(R.id.userpic);
+                    profilePicture.setImageResource(R.color.lightGrey);
                 }
             }
 
-            // set grid image adapter, pass in the list
-            GridView gridViewPosts = findViewById(R.id.gridview);
-            gridViewPosts.setAdapter(new ImageAdapter(UserProfile.this, userPostList));
-            gridViewPosts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View v,
-                                        int position, long id) {
-                    String postKey = userPostIdList.get(position);
-                    String ownerKey = dbUser.getName();
-                    //Toast.makeText(getApplicationContext(), postKey,
-                            //Toast.LENGTH_SHORT).show();
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // do nothing
+            }
+        };
 
-                    // TODO: Start Activity to view item <postKey>
-                    // TODO: Remove Toast
-
-                    Intent intent = new Intent(getApplicationContext(), ItemDetails.class);
-                    String s[] = {postKey, ownerKey};
-                    intent.putExtra("Key", s);
-                    startActivity(intent);
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // loop over all posts
+                // if owner matches profile we are viewing, add them to list
+                for (DataSnapshot postRef : dataSnapshot.getChildren()) {
+                    Post post = postRef.getValue(Post.class);
+                    if (post != null && post.getOwner().equals(profileUid)) {
+                        // keep separate list of posts and postIds because the posts themselves do not
+                        // store their own ids. However these will be in the same order in both lists
+                        // so that we can easily access the id of whichever post we want
+                        userPostList.add(post);
+                        userPostIdList.add(postRef.getKey());
+                    }
                 }
-            });
-        }
 
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
+                // set grid image adapter, pass in the list
+                GridView gridViewPosts = findViewById(R.id.gridview);
+                gridViewPosts.setAdapter(new ImageAdapter(UserProfile.this, userPostList));
+                gridViewPosts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View v,
+                                            int position, long id) {
+                        String postKey = userPostIdList.get(position);
+                        String ownerKey = dbUser.getName();
+                        //Toast.makeText(getApplicationContext(), postKey,
+                        //Toast.LENGTH_SHORT).show();
 
-        }
-    };
+                        // TODO: Start Activity to view item <postKey>
+                        // TODO: Remove Toast
 
-    class RoundedTransformation implements com.squareup.picasso.Transformation {
-        private final int radius;
-        private final int margin;  // dp
-
-        // radius is corner radii in dp
-        // margin is the board in dp
-        public RoundedTransformation(final int radius, final int margin) {
-            this.radius = radius;
-            this.margin = margin;
-        }
-
-        @Override
-        public Bitmap transform(final Bitmap source) {
-            final Paint paint = new Paint();
-            paint.setAntiAlias(true);
-            paint.setShader(new BitmapShader(source, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
-
-            Bitmap output = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(output);
-            canvas.drawRoundRect(new RectF(margin, margin, source.getWidth() - margin, source.getHeight() - margin), radius, radius, paint);
-
-            if (source != output) {
-                source.recycle();
+                        Intent intent = new Intent(getApplicationContext(), ItemDetails.class);
+                        String s[] = {postKey, ownerKey};
+                        intent.putExtra("Key", s);
+                        startActivity(intent);
+                    }
+                });
             }
 
-            return output;
-        }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-        @Override
-        public String key() {
-            return "rounded";
+            }
+        };
+
+        class RoundedTransformation implements com.squareup.picasso.Transformation {
+            private final int radius;
+            private final int margin;  // dp
+
+            // radius is corner radii in dp
+            // margin is the board in dp
+            public RoundedTransformation(final int radius, final int margin) {
+                this.radius = radius;
+                this.margin = margin;
+            }
+
+            @Override
+            public Bitmap transform(final Bitmap source) {
+                final Paint paint = new Paint();
+                paint.setAntiAlias(true);
+                paint.setShader(new BitmapShader(source, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
+
+                Bitmap output = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(output);
+                canvas.drawRoundRect(new RectF(margin, margin, source.getWidth() - margin, source.getHeight() - margin), radius, radius, paint);
+
+                if (source != output) {
+                    source.recycle();
+                }
+
+                return output;
+            }
+
+            @Override
+            public String key() {
+                return "rounded";
+            }
         }
     }
-}
+
