@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.teamandroid.offerup.R;
+import com.teamandroid.offerup.models.ChatUser;
 import com.teamandroid.offerup.models.User;
 
 import java.util.List;
@@ -14,13 +15,13 @@ import java.util.List;
 
 
 public class UserListingRecyclerAdapter extends RecyclerView.Adapter<UserListingRecyclerAdapter.ViewHolder> {
-    private List<User> mUsers;
+    private List<ChatUser> mUsers;
 
-    public UserListingRecyclerAdapter(List<User> users) {
+    public UserListingRecyclerAdapter(List<ChatUser> users) {
         this.mUsers = users;
     }
 
-    public void add(User user) {
+    public void add(ChatUser user) {
         mUsers.add(user);
         notifyItemInserted(mUsers.size() - 1);
     }
@@ -33,7 +34,7 @@ public class UserListingRecyclerAdapter extends RecyclerView.Adapter<UserListing
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        User user = mUsers.get(position);
+        ChatUser user = mUsers.get(position);
 
         if (user.email != null){
             String alphabet = user.email.substring(0, 1);
@@ -51,7 +52,7 @@ public class UserListingRecyclerAdapter extends RecyclerView.Adapter<UserListing
         return 0;
     }
 
-    public User getUser(int position) {
+    public ChatUser getUser(int position) {
         return mUsers.get(position);
     }
 

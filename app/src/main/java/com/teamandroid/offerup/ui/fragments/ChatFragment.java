@@ -14,11 +14,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.teamandroid.offerup.R;
 import com.teamandroid.offerup.core.chat.ChatContract;
 import com.teamandroid.offerup.core.chat.ChatPresenter;
 import com.teamandroid.offerup.events.PushNotificationEvent;
 import com.teamandroid.offerup.models.Chat;
+import com.teamandroid.offerup.ui.activities.ChatActivity;
 import com.teamandroid.offerup.ui.adapters.ChatRecyclerAdapter;
 import com.teamandroid.offerup.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,6 +38,7 @@ import java.util.ArrayList;
 public class ChatFragment extends Fragment implements ChatContract.View, TextView.OnEditorActionListener {
     private RecyclerView mRecyclerViewChat;
     private EditText mETxtMessage;
+    private String receiverDetail;
 
     private ProgressDialog mProgressDialog;
 
@@ -75,6 +81,24 @@ public class ChatFragment extends Fragment implements ChatContract.View, TextVie
     private void bindViews(View view) {
         mRecyclerViewChat = (RecyclerView) view.findViewById(R.id.recycler_view_chat);
         mETxtMessage = (EditText) view.findViewById(R.id.edit_text_message);
+
+        final TextView chattingWithName = view.findViewById(R.id.textView16);
+
+        String receiverUid = getArguments().getString(Constants.ARG_RECEIVER_UID);
+        FirebaseDatabase.getInstance().getReference("users").child(receiverUid).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String name = dataSnapshot.getValue(String.class);
+                chattingWithName.setText(name);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // nothing
+                chattingWithName.setText(getArguments().getString(Constants.ARG_RECEIVER));
+            }
+        });
+
     }
 
     @Override

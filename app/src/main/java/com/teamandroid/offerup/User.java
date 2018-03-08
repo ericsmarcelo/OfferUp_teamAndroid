@@ -7,6 +7,7 @@ public class User {
 
     private String name;
     private String email;
+    private String uid;
     private String phoneNumber;
     private String city;
     private String state;
@@ -21,6 +22,7 @@ public class User {
     public User(String name, String email) {
         this.name = name;
         this.email = email;
+        this.uid = "";
         this.phoneNumber = "";
         this.city = "";
         this.state = "";
@@ -37,6 +39,10 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getUid() {
+        return uid;
     }
 
     public String getPhoneNumber() {
@@ -74,6 +80,10 @@ public class User {
 
     public void setEmail(String newEmail) {
         email = newEmail;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public void setPhoneNumber(String newPhone) {

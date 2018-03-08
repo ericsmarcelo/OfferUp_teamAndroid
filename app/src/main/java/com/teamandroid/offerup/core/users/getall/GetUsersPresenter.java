@@ -1,10 +1,8 @@
 package com.teamandroid.offerup.core.users.getall;
 
-import com.teamandroid.offerup.models.User;
+import com.teamandroid.offerup.models.ChatUser;
 
 import java.util.List;
-
-
 
 public class GetUsersPresenter implements GetUsersContract.Presenter, GetUsersContract.OnGetAllUsersListener {
     private GetUsersContract.View mView;
@@ -26,7 +24,7 @@ public class GetUsersPresenter implements GetUsersContract.Presenter, GetUsersCo
     }
 
     @Override
-    public void onGetAllUsersSuccess(List<User> users) {
+    public void onGetAllUsersSuccess(List<ChatUser> users) {
         mView.onGetAllUsersSuccess(users);
     }
 

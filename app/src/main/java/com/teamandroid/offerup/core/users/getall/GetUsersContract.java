@@ -1,6 +1,6 @@
 package com.teamandroid.offerup.core.users.getall;
 
-import com.teamandroid.offerup.models.User;
+import com.teamandroid.offerup.models.ChatUser;
 
 import java.util.List;
 
@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface GetUsersContract {
     interface View {
-        void onGetAllUsersSuccess(List<User> users);
+        void onGetAllUsersSuccess(List<ChatUser> users);
 
         void onGetAllUsersFailure(String message);
 
-        void onGetChatUsersSuccess(List<User> users);
+        void onGetChatUsersSuccess(List<ChatUser> users);
 
         void onGetChatUsersFailure(String message);
     }
@@ -30,13 +30,13 @@ public interface GetUsersContract {
     }
 
     interface OnGetAllUsersListener {
-        void onGetAllUsersSuccess(List<User> users);
+        void onGetAllUsersSuccess(List<ChatUser> users);
 
         void onGetAllUsersFailure(String message);
     }
 
     interface OnGetChatUsersListener {
-        void onGetChatUsersSuccess(List<User> users);
+        void onGetChatUsersSuccess(List<ChatUser> users);
 
         void onGetChatUsersFailure(String message);
     }

@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.teamandroid.offerup.R;
 import com.teamandroid.offerup.core.users.getall.GetUsersContract;
 import com.teamandroid.offerup.core.users.getall.GetUsersPresenter;
+import com.teamandroid.offerup.models.ChatUser;
 import com.teamandroid.offerup.models.User;
 import com.teamandroid.offerup.ui.activities.ChatActivity;
 import com.teamandroid.offerup.ui.adapters.UserListingRecyclerAdapter;
@@ -100,7 +101,7 @@ public class UsersFragment extends Fragment implements GetUsersContract.View, It
     }
 
     @Override
-    public void onGetAllUsersSuccess(List<User> users) {
+    public void onGetAllUsersSuccess(List<ChatUser> users) {
         mSwipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -124,7 +125,7 @@ public class UsersFragment extends Fragment implements GetUsersContract.View, It
     }
 
     @Override
-    public void onGetChatUsersSuccess(List<User> users) {
+    public void onGetChatUsersSuccess(List<ChatUser> users) {
 
     }
 
