@@ -112,6 +112,7 @@ public class ItemFormPage4 extends AppCompatActivity {
             try {
                 Uri newUri = Uri.fromFile(new File(imageUri.toString()));
                 postImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), newUri);
+                imageUri = imageContentUri;
             } catch(IOException e) {
                 e.printStackTrace();
                 Toast.makeText(ItemFormPage4.this, "Loading image failed.", Toast.LENGTH_SHORT).show();
@@ -138,7 +139,7 @@ public class ItemFormPage4 extends AppCompatActivity {
 
         // rotate if necessary
         try {
-            ExifInterface exifInterface = new ExifInterface(imageContentUri.toString());
+            ExifInterface exifInterface = new ExifInterface(imageUri.toString());
             int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
             Matrix matrix = new Matrix();
             float rotateValue = 0;
@@ -160,7 +161,7 @@ public class ItemFormPage4 extends AppCompatActivity {
             }
         } catch(IOException e) {
             Log.d("IOException", "toHome: error getting exif data");
-            Toast.makeText(ItemFormPage4.this, "Error getting exif data", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(ItemFormPage4.this, "Error getting exif data", Toast.LENGTH_SHORT).show();
         }
 
 
