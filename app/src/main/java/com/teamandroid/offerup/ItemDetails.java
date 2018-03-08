@@ -35,6 +35,7 @@ public class ItemDetails extends AppCompatActivity {
     public FirebaseUser fbUser;
     public String userKey,itemkey;
     public Post currentItem;
+    public String buyerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class ItemDetails extends AppCompatActivity {
         fbAuth = FirebaseAuth.getInstance();
         fbUser = fbAuth.getCurrentUser();
         currentItem = new Post();
+        buyerName = "";
 
         final DatabaseReference databaseReference = fbDatabase.getReference("offer");
 
@@ -87,8 +89,9 @@ public class ItemDetails extends AppCompatActivity {
                 Intent intent = new Intent(ItemDetails.this, OfferPage.class);
                 intent.putExtra("ITEM_PRICE", currentItem.getPrice());
                 intent.putExtra("ITEM_ID", s[0]);
-                intent.putExtra("ITEM_OWNER", currentItem.getOwner());
                 intent.putExtra("ITEM_NAME", currentItem.getItemName());
+                intent.putExtra("ITEM_OWNER", currentItem.getOwner());
+                intent.putExtra("BUYER_NAME", buyerName);
                 startActivity(intent);
             }
 
@@ -128,6 +131,20 @@ public class ItemDetails extends AppCompatActivity {
                     description.setText(currentItem.getDescription());
                     user.setText(s[1]);
                     Glide.with(getApplicationContext()).load(currentItem.getImage()).into(photo);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        fbDatabase.getReference("users").child(fbUser.getUid()).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot != null) {
+                    buyerName = dataSnapshot.getValue(String.class);
                 }
             }
 
