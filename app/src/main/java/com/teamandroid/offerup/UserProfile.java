@@ -33,14 +33,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+import com.teamandroid.offerup.ui.activities.ChatActivity;
 
 import java.util.ArrayList;
 
@@ -58,10 +61,13 @@ public class UserProfile extends AppCompatActivity {
     private boolean flag;
     private Menu menu;
 
+    public String firebaseToken;
+
     public ArrayList<Post> userPostList;
     public ArrayList<String> userPostIdList;
 
     public final int EDIT_PROFILE = 1;
+    public final int CHAT = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,14 +109,14 @@ public class UserProfile extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         fbAuth = FirebaseAuth.getInstance();
         FirebaseUser user = fbAuth.getCurrentUser();
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 
         ImageView userImg = (ImageView) findViewById(R.id.userpic);
 
@@ -171,7 +177,14 @@ public class UserProfile extends AppCompatActivity {
                 editProfile.setIcon(R.drawable.edit);
                 editProfile.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
+            else {
+                // if profile email does not match current logged in user email, then show chat option
+                MenuItem chat = menu.add(2, 2, 102, "Chat With This User");
+                chat.setIcon(R.drawable.ic_action_chat);
+                chat.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
         }
+
         return true;
     }
 
@@ -181,6 +194,18 @@ public class UserProfile extends AppCompatActivity {
         if (id == EDIT_PROFILE) {
             Intent intent = new Intent(UserProfile.this, EditProfile.class);
             startActivity(intent);
+        }
+        else if (id == CHAT) {
+            fbAuth.getCurrentUser().getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
+                @Override
+                public void onSuccess(GetTokenResult getTokenResult) {
+                    firebaseToken = getTokenResult.getToken();
+                    ChatActivity.startActivity(UserProfile.this,
+                            dbUser.getEmail(),
+                            profileUid,
+                            firebaseToken);
+                }
+            });
         }
         return true;
     }

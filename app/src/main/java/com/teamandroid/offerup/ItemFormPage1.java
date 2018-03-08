@@ -1,13 +1,19 @@
 package com.teamandroid.offerup;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,14 +24,21 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ItemFormPage1 extends AppCompatActivity {
 
     private Bundle bundle;
     private EditText itemName;
     private String image;
+    String cameraFilepath; // uri for temp imagefile for use when taking photo with camera
+    File cameraFile;
+    Bitmap newPhoto;
 
     private FirebaseAuth fbAuth;
 
@@ -55,9 +68,31 @@ public class ItemFormPage1 extends AppCompatActivity {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//                }
+
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    cameraFilepath = "";
+                    cameraFile = null;
+                    try {
+                        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        String imageFilename = "JPEG_" + timestamp + "_";
+                        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                        cameraFile = File.createTempFile(imageFilename, ".jpg", storageDir);
+                        cameraFilepath = cameraFile.getAbsolutePath();
+                    }
+                    catch(IOException e) {
+                        notifyUser("Error creating temp file!");
+                        return;
+                    }
+                    if (cameraFile != null) {
+                        Uri photoUri = FileProvider.getUriForFile(ItemFormPage1.this, "com.teamandroid.offerup.fileprovider", cameraFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    }
                 }
             }
         });
@@ -82,11 +117,62 @@ public class ItemFormPage1 extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         bundle = new Bundle();
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
-            Bitmap imageBitmap = (Bitmap)data.getExtras().get("data");
-            imageView.setImageBitmap(imageBitmap);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+//            Bitmap imageBitmap = (Bitmap)data.getExtras().get("data");
+//            imageView.setImageBitmap(imageBitmap);
+//
+//            bundle.putBundle("IMAGE", data.getExtras());
 
-            bundle.putBundle("IMAGE", data.getExtras());
+            File photoFile = new File(cameraFilepath);
+            Uri photoUri = Uri.fromFile(photoFile);
+
+            this.getContentResolver().notifyChange(photoUri, null);
+            ContentResolver cr = this.getContentResolver();
+            try
+            {
+                newPhoto = android.provider.MediaStore.Images.Media.getBitmap(cr, photoUri);
+
+                int photoWidth = newPhoto.getWidth();
+                int photoHeight = newPhoto.getHeight();
+                while (photoWidth > 1000 || photoHeight > 1000) {
+                    photoWidth = photoWidth / 2;
+                    photoHeight = photoHeight / 2;
+                    newPhoto = Bitmap.createScaledBitmap(newPhoto, photoWidth, photoHeight, true);
+                }
+
+                // fix image rotation
+                ExifInterface exifInterface = new ExifInterface(cameraFilepath);
+                int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+                Matrix matrix = new Matrix();
+                float rotateValue = 0;
+                switch(orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        rotateValue = 90;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        rotateValue = 180;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        rotateValue = 270;
+                    default:
+                        break;
+                }
+                if (rotateValue != 0) {
+                    matrix.postRotate(rotateValue);
+                    newPhoto = Bitmap.createBitmap(newPhoto, 0, 0, photoWidth, photoHeight, matrix, true);
+                }
+
+
+                imageView.setImageBitmap(newPhoto);
+
+                bundle.putString("IMAGE", cameraFilepath);
+
+            }
+            catch (Exception e)
+            {
+                Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
+                Log.d("Result of Camera: ", "Failed to load", e);
+            }
         }
         else if (requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK && data != null) {
             try {
@@ -105,7 +191,7 @@ public class ItemFormPage1 extends AppCompatActivity {
 
     public void toPageTwo(View view) {
 
-        if(bundle.getBundle("IMAGE") == null && bundle.getString("IMAGE_URI") == null) {
+        if(bundle.getString("IMAGE") == null && bundle.getString("IMAGE_URI") == null) {
             Toast.makeText(this, "Please add image.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -118,5 +204,9 @@ public class ItemFormPage1 extends AppCompatActivity {
         Intent intent = new Intent(this, ItemFormPage2.class);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    private void notifyUser(String message) {
+        Toast.makeText(ItemFormPage1.this, message, Toast.LENGTH_SHORT).show();
     }
 }

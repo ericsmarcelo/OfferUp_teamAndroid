@@ -1,15 +1,19 @@
 package com.teamandroid.offerup;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -36,8 +40,12 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class EditProfile extends AppCompatActivity {
 
@@ -73,6 +81,8 @@ public class EditProfile extends AppCompatActivity {
     public int imageState = NO_CHANGE;
     public Bitmap newPhoto = null;
     public Bitmap oldPhoto = null;
+    String cameraFilepath; // uri for temp imagefile for use when taking photo with camera
+    File cameraFile;
     // need variables here to store bitmap (from camera) or uri (from gallery)
 
     @Override
@@ -126,7 +136,25 @@ public class EditProfile extends AppCompatActivity {
                         // open camera activity
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                            cameraFilepath = "";
+                            cameraFile = null;
+                            try {
+                                String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                                String imageFilename = "JPEG_" + timestamp + "_";
+                                File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                                cameraFile = File.createTempFile(imageFilename, ".jpg", storageDir);
+                                cameraFilepath = cameraFile.getAbsolutePath();
+                            }
+                            catch(IOException e) {
+                                notifyUser("Error creating temp file!");
+                                return;
+                            }
+                            if (cameraFile != null) {
+                                Uri photoUri = FileProvider.getUriForFile(EditProfile.this, "com.teamandroid.offerup.fileprovider", cameraFile);
+                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                            }
+//                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                         }
                     }
                 });
@@ -205,14 +233,58 @@ public class EditProfile extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             // handle image from camera
             imageState = NEW_FROM_CAMERA;
 
-            // TODO: Get Full Sized Image From Camera
-            // setImage to bitmap, although this only gets thumbnail image currently
-            newPhoto = (Bitmap)data.getExtras().get("data");
-            profilePicture.setImageBitmap(newPhoto);
+            File photoFile = new File(cameraFilepath);
+            Uri photoUri = Uri.fromFile(photoFile);
+
+            this.getContentResolver().notifyChange(photoUri, null);
+            ContentResolver cr = this.getContentResolver();
+            try
+            {
+                newPhoto = android.provider.MediaStore.Images.Media.getBitmap(cr, photoUri);
+
+                int photoWidth = newPhoto.getWidth();
+                int photoHeight = newPhoto.getHeight();
+                while (photoWidth > 1000 || photoHeight > 1000) {
+                    photoWidth = photoWidth / 2;
+                    photoHeight = photoHeight / 2;
+                    newPhoto = Bitmap.createScaledBitmap(newPhoto, photoWidth, photoHeight, true);
+                }
+
+                // fix image rotation
+                ExifInterface exifInterface = new ExifInterface(cameraFilepath);
+                int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+                Matrix matrix = new Matrix();
+                float rotateValue = 0;
+                switch(orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        rotateValue = 90;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        rotateValue = 180;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        rotateValue = 270;
+                    default:
+                        break;
+                }
+                if (rotateValue != 0) {
+                    matrix.postRotate(rotateValue);
+                    newPhoto = Bitmap.createBitmap(newPhoto, 0, 0, photoWidth, photoHeight, matrix, true);
+                }
+
+
+                profilePicture.setImageBitmap(newPhoto);
+            }
+            catch (Exception e)
+            {
+                Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
+                Log.d("Result of Camera: ", "Failed to load", e);
+            }
+
         }
         else if (requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK && data != null) {
             // handle image from gallery
@@ -223,10 +295,45 @@ public class EditProfile extends AppCompatActivity {
                 InputStream imageStream = getContentResolver().openInputStream(imageUri);
                 newPhoto = BitmapFactory.decodeStream(imageStream);
 
-                // TODO: Rotate image
-                // image seems to be rotated incorrectly when loaded
-                // so we should rotate it back here
-                // use support library to get exif data and rotate based on its current orientation
+                int photoWidth = newPhoto.getWidth();
+                int photoHeight = newPhoto.getHeight();
+                while (photoWidth > 1000 || photoHeight > 1000) {
+                    photoWidth = photoWidth / 2;
+                    photoHeight = photoHeight / 2;
+                    newPhoto = Bitmap.createScaledBitmap(newPhoto, photoWidth, photoHeight, true);
+                }
+
+                try {
+                    // fix image rotation
+                    ExifInterface exifInterface = new ExifInterface(imageUri.toString());
+                    int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+                    Matrix matrix = new Matrix();
+                    float rotateValue = 0;
+                    switch(orientation) {
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            rotateValue = 90;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            rotateValue = 180;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            rotateValue = 270;
+                        default:
+                            break;
+                    }
+                    if (rotateValue != 0) {
+                        matrix.postRotate(rotateValue);
+                        newPhoto = Bitmap.createBitmap(newPhoto, 0, 0, photoWidth, photoHeight, matrix, true);
+                    }
+                }
+                catch (IOException e) {
+                    //notifyUser("Failed to get EXIF data from gallery image");
+                    // rotate 90 degrees and hope for the best
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    newPhoto = Bitmap.createBitmap(newPhoto, 0, 0, photoWidth, photoHeight, matrix, true);
+                }
+
 
                 profilePicture.setImageBitmap(newPhoto);
 

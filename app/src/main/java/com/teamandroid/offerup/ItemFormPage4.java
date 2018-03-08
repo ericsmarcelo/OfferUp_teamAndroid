@@ -2,6 +2,8 @@ package com.teamandroid.offerup;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -29,6 +31,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +83,7 @@ public class ItemFormPage4 extends AppCompatActivity {
         TextView tempDescription = findViewById(R.id.tempDescription);
 
         tempItemName.setText(b.getString("ITEM_NAME"));
-        tempPrice.setText(String.format(Locale.getDefault(),"%f", b.getFloat("ITEM_PRICE")));
+        tempPrice.setText(String.format(Locale.getDefault(),"%.2f", b.getFloat("ITEM_PRICE")));
         tempCategory.setText(b.getString("CATEGORY"));
         tempDescription.setText(b.getString("ITEM_DESC"));
 
@@ -99,30 +102,69 @@ public class ItemFormPage4 extends AppCompatActivity {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Bitmap postImage = null;
 
-        if (b.getBundle("IMAGE") != null) {
-            postImage = (Bitmap)b.getBundle("IMAGE").get("data");
+        Uri imageUri = null;
+        Uri imageContentUri = null;
+
+        if (b.getString("IMAGE") != null) {
+            //postImage = (Bitmap)b.getBundle("IMAGE").get("data");
+            imageUri = Uri.parse(b.getString("IMAGE"));
+            imageContentUri = imageUri;
+            try {
+                Uri newUri = Uri.fromFile(new File(imageUri.toString()));
+                postImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), newUri);
+                imageUri = imageContentUri;
+            } catch(IOException e) {
+                e.printStackTrace();
+                Toast.makeText(ItemFormPage4.this, "Loading image failed.", Toast.LENGTH_SHORT).show();
+            }
         }
         else if (b.getString("IMAGE_URI") != null) {
-            Uri imageUri = Uri.parse(b.getString("IMAGE_URI"));
+            imageUri = Uri.parse(b.getString("IMAGE_URI"));
             try {
                 postImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                // crudely resize postImage bitmap if its too big (it probably will be)
-                int imageWidth = postImage.getWidth();
-                int imageHeight = postImage.getHeight();
-                if (imageWidth > 2000 || imageHeight > 2000) {
-                    // Toast.makeText(ItemFormPage4.this, "Resizing large image...", Toast.LENGTH_SHORT).show();
-                    imageWidth = (int)(imageWidth*0.25);
-                    imageHeight = (int)(imageHeight*0.25);
-                    postImage = Bitmap.createScaledBitmap(postImage, imageWidth, imageHeight, true);
-                }
             } catch(IOException e) {
                 e.printStackTrace();
                 Toast.makeText(ItemFormPage4.this, "Converting image uri to bitmap went wrong.", Toast.LENGTH_LONG).show();
             }
-
-
-
         }
+
+        // resize image if necessary
+        int imageWidth = postImage.getWidth();
+        int imageHeight = postImage.getHeight();
+        if (imageWidth > 2000 || imageHeight > 2000) {
+            imageWidth = (int)(imageWidth*0.25);
+            imageHeight = (int)(imageHeight*0.25);
+            postImage = Bitmap.createScaledBitmap(postImage, imageWidth, imageHeight, true);
+        }
+
+        // rotate if necessary
+        try {
+            ExifInterface exifInterface = new ExifInterface(imageUri.toString());
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+            Matrix matrix = new Matrix();
+            float rotateValue = 0;
+            switch(orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotateValue = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotateValue = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotateValue = 270;
+                default:
+                    break;
+            }
+            if (rotateValue != 0) {
+                matrix.postRotate(rotateValue);
+                postImage = Bitmap.createBitmap(postImage, 0, 0, imageWidth, imageHeight, matrix, true);
+            }
+        } catch(IOException e) {
+            Log.d("IOException", "toHome: error getting exif data");
+            //Toast.makeText(ItemFormPage4.this, "Error getting exif data", Toast.LENGTH_SHORT).show();
+        }
+
+
         postImage.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] imageData = baos.toByteArray();
         UploadTask uploadTask = imagesRef.putBytes(imageData);
