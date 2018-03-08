@@ -23,13 +23,13 @@
 
     <include layout="@layout/content_user_profile" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="77dp"
-        android:layout_height="61dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_add"
-        app:fabSize="normal" />
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_width="77dp"-->
+        <!--android:layout_height="61dp"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--app:srcCompat="@drawable/ic_add"-->
+        <!--app:fabSize="normal" />-->
 
 </android.support.design.widget.CoordinatorLayout>
